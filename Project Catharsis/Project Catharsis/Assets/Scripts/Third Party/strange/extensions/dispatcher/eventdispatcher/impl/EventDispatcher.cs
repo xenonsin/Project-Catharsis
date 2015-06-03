@@ -84,6 +84,7 @@ namespace strange.extensions.dispatcher.eventdispatcher.impl
 		{
 			//Scrub the data to make eventType and data conform if possible
 			IEvent evt = conformDataToEvent (eventType, data);
+
 			if (evt is IPoolable)
 			{
 				(evt as IPoolable).Retain ();
@@ -95,20 +96,11 @@ namespace strange.extensions.dispatcher.eventdispatcher.impl
 				isTriggeringClients = true;
 				foreach (ITriggerable trigger in triggerClients)
 				{
-					try 
+					if (!trigger.Trigger(eventType, evt))
 					{
-						if (!trigger.Trigger(evt.type, evt))
-						{
-							continueDispatch = false;
-							break;
-						}
+						continueDispatch = false;
+						break;
 					}
-					catch (Exception ex) //If trigger throws, we still want to cleanup!
-					{
-						internalReleaseEvent(evt);
-						throw;
-					}
-					
 				}
 				if (triggerClientRemovals != null)
 				{
@@ -123,7 +115,7 @@ namespace strange.extensions.dispatcher.eventdispatcher.impl
 				return;
 			}
 
-			IEventBinding binding = GetBinding (evt.type) as IEventBinding;
+			IEventBinding binding = GetBinding (eventType) as IEventBinding;
 			if (binding == null)
 			{
 				internalReleaseEvent (evt);
