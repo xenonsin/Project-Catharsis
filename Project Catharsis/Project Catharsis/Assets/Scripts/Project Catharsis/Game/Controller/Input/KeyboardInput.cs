@@ -2,7 +2,6 @@
 using strange.extensions.dispatcher.eventdispatcher.api;
 using UnityEngine;
 using System.Collections;
-using TeamUtility.IO;
 
 namespace Catharsis
 {
@@ -17,6 +16,9 @@ namespace Catharsis
         [Inject]
         public GameInputSignal gameInputSignal { get; set; }
 
+        [Inject]
+        public IInputManager inputManager { get; set; }
+
         [PostConstruct]
         public void PostConstruct()
         {
@@ -29,23 +31,23 @@ namespace Catharsis
             while (true)
             {
                 int input = GameInputEvent.NONE;
-                if (InputManager.GetKeyDown(KeyCode.Space))
+                if (inputManager.GetKeyDown(KeyCode.Space))
                 {
                     input |= GameInputEvent.NONE;
                 }
-                if (InputManager.GetKeyDown(KeyCode.A))
+                if (inputManager.GetKeyDown(KeyCode.A))
                 {
                     input |= GameInputEvent.MOVE_LEFT;
                 }
-                if (InputManager.GetKeyDown(KeyCode.W))
+                if (inputManager.GetKeyDown(KeyCode.W))
                 {
                     input |= GameInputEvent.MOVE_FORWARD;
                 }
-                if (InputManager.GetKeyDown(KeyCode.D))
+                if (inputManager.GetKeyDown(KeyCode.D))
                 {
                     input |= GameInputEvent.MOVE_RIGHT;
                 }
-                if (InputManager.GetKeyDown(KeyCode.S))
+                if (inputManager.GetKeyDown(KeyCode.S))
                 {
                     input |= GameInputEvent.MOVE_BACKWARD;
                 }

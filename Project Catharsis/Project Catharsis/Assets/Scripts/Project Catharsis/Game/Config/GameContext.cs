@@ -21,6 +21,7 @@ namespace Catharsis
 
             //Mapping Input
             injectionBinder.Bind<IInput>().To<KeyboardInput>().ToSingleton();
+          
 
             //injectionBinder.Bind<ISpawner>().To<ObstacleSpawner>().ToSingleton();
 
