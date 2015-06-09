@@ -20,8 +20,8 @@ namespace Catharsis
         private string[] rawMouseAxes;
         private string[] rawJoystickAxes;
         private KeyCode[] keys;
-        private Dictionary<string, InputConfiguration> configurationTable;
-        private Dictionary<string, Dictionary<string, AxisConfiguration>> axesTable;
+        private Dictionary<string, InputConfiguration> configurationTable; //Holds all active configurations
+        private Dictionary<string, Dictionary<string, AxisConfiguration>> axesTable; //Holds current axes Table
         #endregion
 
 
@@ -44,10 +44,11 @@ namespace Catharsis
             
         }
 
+        
         public AxisConfiguration GetAxisConfiguration(string inputConfigName, string axisName)
         {
             Dictionary<string, AxisConfiguration> table;
-            if (axesTable.TryGetValue(inputConfigName, out table))
+            if (axesTable.TryGetValue(inputConfigName, out table)) //Returns true if it contains an element with the specified key, and when it returns, it contains the value associated with the key.
             {
                 AxisConfiguration axisConfig;
                 if (table.TryGetValue(axisName, out axisConfig))

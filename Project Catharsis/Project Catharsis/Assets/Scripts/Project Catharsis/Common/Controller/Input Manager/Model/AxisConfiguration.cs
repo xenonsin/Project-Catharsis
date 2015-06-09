@@ -152,7 +152,7 @@ namespace Catharsis
             _analogButtonState = ButtonState.Released;
         }
 
-        public void Update()
+        public void Update() //This shouldn't be here.
         {
             _deltaTime = inputManager.ignoreTimeScale ? (Time.realtimeSinceStartup - _lastUpdateTime) : Time.deltaTime;
             _lastUpdateTime = Time.realtimeSinceStartup;

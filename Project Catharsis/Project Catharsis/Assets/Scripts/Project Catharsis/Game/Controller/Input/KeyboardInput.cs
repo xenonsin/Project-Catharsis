@@ -31,23 +31,19 @@ namespace Catharsis
             while (true)
             {
                 int input = GameInputEvent.NONE;
-                if (inputManager.GetKeyDown(KeyCode.Space))
-                {
-                    input |= GameInputEvent.NONE;
-                }
-                if (inputManager.GetKeyDown(KeyCode.A))
+                if (inputManager.GetButtonDown("Left"))
                 {
                     input |= GameInputEvent.MOVE_LEFT;
                 }
-                if (inputManager.GetKeyDown(KeyCode.W))
+                if (inputManager.GetButtonDown("Forward"))
                 {
                     input |= GameInputEvent.MOVE_FORWARD;
                 }
-                if (inputManager.GetKeyDown(KeyCode.D))
+                if (inputManager.GetButtonDown("Right"))
                 {
                     input |= GameInputEvent.MOVE_RIGHT;
                 }
-                if (inputManager.GetKeyDown(KeyCode.S))
+                if (inputManager.GetButtonDown("Back"))
                 {
                     input |= GameInputEvent.MOVE_BACKWARD;
                 }
