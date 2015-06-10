@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using strange.extensions.context.api;
 using strange.extensions.injector.api;
 
-namespace Catharsis
+namespace Catharsis.InputEditor
 {
     [Implements(typeof(IInputManager), InjectionBindingScope.CROSS_CONTEXT)]
     public class InputManager : IInputManager

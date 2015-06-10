@@ -2,6 +2,7 @@
 using strange.extensions.dispatcher.eventdispatcher.api;
 using UnityEngine;
 using System.Collections;
+using Catharsis.InputEditor;
 
 namespace Catharsis
 {
@@ -31,22 +32,23 @@ namespace Catharsis
             while (true)
             {
                 int input = GameInputEvent.NONE;
-                if (inputManager.GetButtonDown("Left"))
-                {
-                    input |= GameInputEvent.MOVE_LEFT;
-                }
-                if (inputManager.GetButtonDown("Forward"))
+                if (inputManager.GetKeyDown(KeyCode.W))//inputManager.GetButtonDown("Forward"))
                 {
                     input |= GameInputEvent.MOVE_FORWARD;
                 }
-                if (inputManager.GetButtonDown("Right"))
+                if (inputManager.GetKeyDown(KeyCode.A))//inputManager.GetButtonDown("Left"))
                 {
-                    input |= GameInputEvent.MOVE_RIGHT;
+                    input |= GameInputEvent.MOVE_LEFT;
                 }
-                if (inputManager.GetButtonDown("Back"))
+                if (inputManager.GetKeyDown(KeyCode.S))//inputManager.GetButtonDown("Back"))
                 {
                     input |= GameInputEvent.MOVE_BACKWARD;
                 }
+                if (inputManager.GetKeyDown(KeyCode.D))//inputManager.GetButtonDown("Right"))
+                {
+                    input |= GameInputEvent.MOVE_RIGHT;
+                }
+             
                 gameInputSignal.Dispatch(input);
                 yield return null;
             }

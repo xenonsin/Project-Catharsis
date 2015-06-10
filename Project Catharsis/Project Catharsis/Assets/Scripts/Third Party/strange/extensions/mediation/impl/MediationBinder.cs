@@ -30,6 +30,7 @@ using strange.extensions.injector.api;
 using strange.extensions.mediation.api;
 using strange.framework.api;
 using strange.framework.impl;
+using System.Collections.Generic;
 
 namespace strange.extensions.mediation.impl
 {
@@ -74,6 +75,40 @@ namespace strange.extensions.mediation.impl
 				injectViewAndChildren(view);
 			}
 		}
+
+		override protected IBinding performKeyValueBindings(List<object> keyList, List<object> valueList)
+		{
+			IBinding binding = null;
+
+			// Bind in order
+			foreach (object key in keyList)
+			{
+				Type keyType = Type.GetType (key as string);
+				if (keyType == null)
+				{
+					throw new BinderException ("A runtime Mediation Binding has resolved to null. Did you forget to register its fully-qualified name?\n View:" + key, BinderExceptionType.RUNTIME_NULL_VALUE);
+				}
+				if (binding == null)
+				{
+					binding = Bind (keyType);
+				}
+				else
+				{
+					binding = binding.Bind (keyType);
+				}
+			}
+			foreach (object value in valueList)
+			{
+				Type valueType = Type.GetType (value as string);
+				if (valueType == null)
+				{
+					throw new BinderException ("A runtime Mediation Binding has resolved to null. Did you forget to register its fully-qualified name?\n Mediator:" + value, BinderExceptionType.RUNTIME_NULL_VALUE);
+				}
+				binding = binding.To (valueType);
+			}
+
+			return binding;
+		}
 		
 		/// Initialize all IViews within this view
 		virtual protected void injectViewAndChildren(IView view)
@@ -99,9 +134,9 @@ namespace strange.extensions.mediation.impl
 			injectionBinder.injector.Inject (mono, false);
 		}
 
-		public override IBinding Bind<T> ()
+		new public IMediationBinding Bind<T> ()
 		{
-			return base.Bind<T> ();
+			return base.Bind<T> () as IMediationBinding;
 		}
 
 		public IMediationBinding BindView<T>() where T : MonoBehaviour
@@ -132,9 +167,11 @@ namespace strange.extensions.mediation.impl
 						throw new MediationException ("The view: " + viewType.ToString() + " is mapped to mediator: " + mediatorType.ToString() + ". AddComponent resulted in null, which probably means " + mediatorType.ToString().Substring(mediatorType.ToString().LastIndexOf(".")+1) + " is not a MonoBehaviour.", MediationExceptionType.NULL_MEDIATOR);
 					if (mediator is IMediator)
 						((IMediator)mediator).PreRegister ();
-					injectionBinder.Bind (viewType).ToValue (view).ToInject(false);
+
+					Type typeToInject = (binding.abstraction == null || binding.abstraction.Equals(BindingConst.NULLOID)) ? viewType : binding.abstraction as Type;
+					injectionBinder.Bind (typeToInject).ToValue (view).ToInject(false);
 					injectionBinder.injector.Inject (mediator);
-					injectionBinder.Unbind(viewType);
+					injectionBinder.Unbind(typeToInject);
 					if (mediator is IMediator)
 						((IMediator)mediator).OnRegister ();
 				}

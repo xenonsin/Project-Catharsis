@@ -25,7 +25,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Catharsis
+namespace Catharsis.InputEditor
 {
 	[Serializable]
 	public sealed class InputConfiguration

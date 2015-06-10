@@ -24,14 +24,11 @@ using UnityEngine;
 using System;
 using System.Collections;
 
-namespace Catharsis
+namespace Catharsis.InputEditor
 {
     [Serializable]
     public sealed class AxisConfiguration
     {
-        [Inject]
-        public IInputManager inputManager { get; set; }
-
         #region [Constants]
         public const float Neutral = 0.0f;
         public const float Positive = 1.0f;
@@ -143,7 +140,7 @@ namespace Catharsis
             sensitivity = 1.0f;
         }
 
-        public void Initialize()
+        public void Initialize() //This shouldn't be here...
         {
             UpdateRawAxisName();
             _value = Neutral;
@@ -152,9 +149,9 @@ namespace Catharsis
             _analogButtonState = ButtonState.Released;
         }
 
-        public void Update() //This shouldn't be here.
+        public void Update() //This shouldn't be here...
         {
-            _deltaTime = inputManager.ignoreTimeScale ? (Time.realtimeSinceStartup - _lastUpdateTime) : Time.deltaTime;
+            //_deltaTime = inputManager.ignoreTimeScale ? (Time.realtimeSinceStartup - _lastUpdateTime) : Time.deltaTime;
             _lastUpdateTime = Time.realtimeSinceStartup;
 
             if (_lastType != type || _lastAxis != axis || _lastJoystick != joystick)

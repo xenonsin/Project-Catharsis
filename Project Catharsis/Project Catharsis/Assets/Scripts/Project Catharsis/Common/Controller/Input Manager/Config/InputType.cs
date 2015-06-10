@@ -1,4 +1,4 @@
-﻿namespace Catharsis
+﻿namespace Catharsis.InputEditor
 {
     public enum InputType
     {

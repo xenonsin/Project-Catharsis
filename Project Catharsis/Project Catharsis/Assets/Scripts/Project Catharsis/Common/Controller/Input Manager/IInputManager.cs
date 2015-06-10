@@ -3,7 +3,7 @@
 using System;
 using UnityEngine;
 
-namespace Catharsis
+namespace Catharsis.InputEditor
 {
     public interface IInputManager
     {
