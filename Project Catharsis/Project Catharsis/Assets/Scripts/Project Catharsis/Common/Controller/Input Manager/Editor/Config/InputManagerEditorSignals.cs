@@ -3,6 +3,5 @@
 namespace Catharsis.InputEditor
 {
     public class InputManagerEditorStartSignal : Signal { }
-
     public class ScriptReloadSignal : Signal { }
 }

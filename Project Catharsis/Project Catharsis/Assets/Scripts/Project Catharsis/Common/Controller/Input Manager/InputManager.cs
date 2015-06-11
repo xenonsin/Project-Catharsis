@@ -13,10 +13,11 @@ namespace Catharsis.InputEditor
         public GameObject contextView { get; set; }
 
         #region Fields
+        private List<InputConfiguration> _inputConfigurations = new List<InputConfiguration>(); 
         private InputConfiguration currentConfiguration;
         public bool ignoreTimeScale { get; set; }
 
-
+        //Cached data
         private string[] rawMouseAxes;
         private string[] rawJoystickAxes;
         private KeyCode[] keys;
@@ -30,19 +31,9 @@ namespace Catharsis.InputEditor
          {
              keys = (KeyCode[])Enum.GetValues(typeof(KeyCode));
              ignoreTimeScale = true;
-             SetRawAxisNames();
-             Initialize();
          }
 
-        void SetRawAxisNames()
-        {
-            
-        }
 
-        void Initialize()
-        {
-            
-        }
 
         
         public AxisConfiguration GetAxisConfiguration(string inputConfigName, string axisName)

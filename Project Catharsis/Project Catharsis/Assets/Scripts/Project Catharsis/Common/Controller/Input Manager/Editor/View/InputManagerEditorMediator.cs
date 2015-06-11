@@ -10,12 +10,16 @@ namespace Catharsis.InputEditor.View
         public override void OnRegister()
         {
             base.OnRegister();
+
         }
 
         public override void OnRemove()
         {
             base.OnRemove();
+
         }
+
+
 
     }
 }

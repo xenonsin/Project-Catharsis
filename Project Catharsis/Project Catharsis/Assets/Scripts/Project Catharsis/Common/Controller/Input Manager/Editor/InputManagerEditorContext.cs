@@ -2,6 +2,7 @@
 using System.Collections;
 using Catharsis.InputEditor.Controller;
 using Catharsis.InputEditor.Service;
+using Catharsis.InputEditor.View;
 using UnityEditor;
 using strange.extensions.editor.impl;
 
@@ -27,6 +28,9 @@ namespace Catharsis.InputEditor
             injectionBinder.Bind<ScriptReloadService>().ToSingleton();
             //Commands
             commandBinder.Bind<InputManagerEditorStartSignal>().To<InitInputManagerCommand>();
+
+            //Views
+            mediationBinder.Bind<InputManagerEditorView>().To<InputManagerEditorMediator>();
         }
 
         public override void Launch()
