@@ -86,6 +86,8 @@ namespace Catharsis.InputEditor.View
 
         void OnEnable()
         {
+
+            base.OnEnable();
             //Get the serializable input manager
             _inputManager = AssetDatabase.LoadAssetAtPath(INPUTMANAGER_PATH, typeof (InputManager)) as InputManager;
 
@@ -113,6 +115,7 @@ namespace Catharsis.InputEditor.View
 
         private void OnDisable()
         {
+            base.OnDisable();
             Texture2D.DestroyImmediate(_highlightTexture);
             _highlightTexture = null;
 
@@ -488,6 +491,7 @@ namespace Catharsis.InputEditor.View
 
         private void LoadInputConfigurationsFromResource()
         {
+            //TODO: Work on json serialization
             if (_inputManager.GetInputConfigurationCount() > 0)
             {
                 bool cont = EditorUtility.DisplayDialog("Warning", "This operation will replace the current input configrations!\nDo you want to continue?", "Yes", "No");
