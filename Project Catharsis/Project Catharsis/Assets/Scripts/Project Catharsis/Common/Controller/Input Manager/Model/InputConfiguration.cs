@@ -43,6 +43,12 @@ namespace Catharsis.InputEditor
 			this.name = name;
 			isExpanded = false;
 		}
+
+	    public void AddNewAxisConfiguration()
+	    {
+	        axes.Add(new AxisConfiguration());
+	        isExpanded = true;
+	    }
 		
 		public static InputConfiguration Duplicate(InputConfiguration source)
 		{

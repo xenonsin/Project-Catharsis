@@ -6,15 +6,24 @@ using strange.extensions.injector.api;
 
 namespace Catharsis.InputEditor
 {
-    [Implements(typeof(IInputManager), InjectionBindingScope.CROSS_CONTEXT)]
-    public class InputManager : IInputManager
+    [Implements(typeof (IInputManager), InjectionBindingScope.CROSS_CONTEXT)]
+    public class InputManager : ScriptableObject, IInputManager
     {
-         [Inject(ContextKeys.CONTEXT_VIEW)]
+        [Inject(ContextKeys.CONTEXT_VIEW)]
         public GameObject contextView { get; set; }
 
         #region Fields
-        private List<InputConfiguration> _inputConfigurations = new List<InputConfiguration>(); 
+
+        //Bug: This doesn't allow for configs that are the same name. Doesn't disallow the player to create duplicates.
+        [SerializeField]
+        private string defaultConfiguration;
+
+        [SerializeField] //Note: Might change this to it's own seperate editor script.
+        private List<InputConfiguration> _inputConfigurations = new List<InputConfiguration>();
+
         private InputConfiguration currentConfiguration;
+
+
         public bool ignoreTimeScale { get; set; }
 
         //Cached data
@@ -23,20 +32,57 @@ namespace Catharsis.InputEditor
         private KeyCode[] keys;
         private Dictionary<string, InputConfiguration> configurationTable; //Holds all active configurations
         private Dictionary<string, Dictionary<string, AxisConfiguration>> axesTable; //Holds current axes Table
+
         #endregion
 
 
-         [PostConstruct]
+        [PostConstruct]
         public void PostConstruct()
-         {
-             keys = (KeyCode[])Enum.GetValues(typeof(KeyCode));
-             ignoreTimeScale = true;
-         }
+        {
+            keys = (KeyCode[]) Enum.GetValues(typeof (KeyCode));
+            ignoreTimeScale = true;
+        }
+
+
+        public void AddNewInputConfiguration()
+        {
+            _inputConfigurations.Add(new InputConfiguration());
+        }
+
+        public int GetInputConfigurationCount()
+        {
+            return _inputConfigurations.Count;
+        }
+
+        public InputConfiguration GetInputConfiguration(int index)
+        {
+            return _inputConfigurations[index];
+        }
+
+        public void SetInputConfiguration(List<InputConfiguration> config)
+        {
+            _inputConfigurations = config;
+        }
+
+        public InputConfiguration GetCurrentInputConfiguration()
+        {
+            return currentConfiguration;
+            
+        }
+
+        public string GetDefaultConfiguration()
+        {
+            return defaultConfiguration;
+        }
+
+        public void SetDefaultConfiguration(string name)
+        {
+            defaultConfiguration = name;
+        }
 
 
 
-        
-        public AxisConfiguration GetAxisConfiguration(string inputConfigName, string axisName)
+    public AxisConfiguration GetAxisConfiguration(string inputConfigName, string axisName)
         {
             Dictionary<string, AxisConfiguration> table;
             if (axesTable.TryGetValue(inputConfigName, out table)) //Returns true if it contains an element with the specified key, and when it returns, it contains the value associated with the key.
