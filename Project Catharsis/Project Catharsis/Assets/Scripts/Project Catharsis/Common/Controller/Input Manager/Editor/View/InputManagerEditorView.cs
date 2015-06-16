@@ -4,11 +4,17 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.IO;
 using Catharsis.InputEditor.Controller;
+using strange.extensions.signal.impl;
 
 namespace Catharsis.InputEditor.View
 {
     public sealed class InputManagerEditorView : EditorView
     {
+        #region Signals
+        internal Signal<string> SendLoadPathSignal = new Signal<string>();
+        internal Signal<string> SendSaveInputPathSignal = new Signal<string>();
+        #endregion
+
         #region Menu Options
         public enum FileMenuOptions
         {
@@ -298,6 +304,7 @@ namespace Catharsis.InputEditor.View
             //    InputManager.SetInputConfiguration(inputConfig.name);
             //}
             GUI.enabled = true;
+            EditorUtility.SetDirty(_inputManager);
 
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndScrollView();
@@ -352,6 +359,7 @@ namespace Catharsis.InputEditor.View
                 GUI.enabled = true;
             }
 
+            EditorUtility.SetDirty(_inputManager);
             GUILayout.EndScrollView();
             GUILayout.EndArea();
         }
@@ -424,7 +432,7 @@ namespace Catharsis.InputEditor.View
                         InputEditorTools.OverwriteInputSettings();
                         break;
                     case FileMenuOptions.CreateDefaultInputConfig:
-                        LoadInputConfigurationsFromResource(INPUT_MANAGER_DEFAULT_CONFIG);
+                        LoadInputConfigurationsFromResource();                   
                         break;
                     case FileMenuOptions.NewInputConfiguration:
                         CreateNewInputConfiguration();
@@ -478,34 +486,22 @@ namespace Catharsis.InputEditor.View
             
         }
 
-        private void LoadInputConfigurationsFromResource(string resourcePath)
+        private void LoadInputConfigurationsFromResource()
         {
-            string defaultConfig = "";
-            List<InputConfiguration> config;
-
             if (_inputManager.GetInputConfigurationCount() > 0)
             {
                 bool cont = EditorUtility.DisplayDialog("Warning", "This operation will replace the current input configrations!\nDo you want to continue?", "Yes", "No");
                 if (!cont) return;
             }
 
-            TextAsset textAsset = Resources.Load<TextAsset>(resourcePath);
-            if (textAsset != null)
-            {
-                using (System.IO.StringReader reader = new System.IO.StringReader(textAsset.text))
-                {
-                    //TODO: Put this in the mediator and create a command to reduce coupling.
-                    InputLoaderXML inputLoader = new InputLoaderXML(reader);
-                    inputLoader.Load(out config, out defaultConfig);
-                    _inputManager.SetDefaultConfiguration(defaultConfig);
-                    _inputManager.SetInputConfiguration(config);
-                    _selectionIndex.Clear();
-                }
-            }
-            else
-            {
-                EditorUtility.DisplayDialog("Error", "Failed to load input configurations. The resource file might have been deleted or renamed.", "OK");
-            }
+            SendLoadPathSignal.Dispatch(INPUT_MANAGER_DEFAULT_CONFIG);
+        }
+
+        public void ReplaceCurrentConfigurations(string defaultConfig, List<InputConfiguration> config)
+        {
+            _inputManager.SetDefaultConfiguration(defaultConfig);
+            _inputManager.SetInputConfiguration(config);
+            _selectionIndex.Clear();
         }
 
 

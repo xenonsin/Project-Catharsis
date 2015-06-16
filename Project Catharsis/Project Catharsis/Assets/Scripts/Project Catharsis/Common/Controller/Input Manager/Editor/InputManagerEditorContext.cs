@@ -26,6 +26,7 @@ namespace Catharsis.InputEditor
             //Injections
             injectionBinder.Bind<ScriptReloadSignal>().ToSingleton();
             injectionBinder.Bind<ScriptReloadService>().ToSingleton();
+            injectionBinder.Bind<IInputLoader>().To<InputLoaderJSON>();
             //Commands
             commandBinder.Bind<InputManagerEditorStartSignal>().To<InitInputManagerCommand>();
 
