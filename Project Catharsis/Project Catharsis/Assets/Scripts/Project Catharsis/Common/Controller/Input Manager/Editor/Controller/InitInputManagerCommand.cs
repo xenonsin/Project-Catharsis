@@ -10,7 +10,7 @@ namespace Catharsis.InputEditor.Controller
         public ScriptReloadService scriptReloadService { get; set; } //Use this for instantiation
         public override void Execute()
         {
-            Debug.Log("Input Manager Editor Loaded");
+            //Debug.Log("Input Manager Editor Loaded");
         }
     }
 }

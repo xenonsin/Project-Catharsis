@@ -95,6 +95,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 224: {fileID: 87168746}
+  - 114: {fileID: 87168747}
   m_Layer: 5
   m_Name: MainPage
   m_TagString: Untagged
@@ -120,6 +121,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: .5, y: .5}
+--- !u!114 &87168747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 87168745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d122999083625b44c9d8e871f88df1a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ResumeButton: {fileID: 1204437714}
+  ControlsButton: {fileID: 857558083}
+  QuitButton: {fileID: 1487874263}
 --- !u!1 &132913175
 GameObject:
   m_ObjectHideFlags: 0
@@ -1663,8 +1678,8 @@ GameObject:
   m_Component:
   - 4: {fileID: 1286600739}
   - 114: {fileID: 1286600742}
-  - 114: {fileID: 1286600741}
   - 114: {fileID: 1286600740}
+  - 114: {fileID: 1286600741}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -1868,8 +1883,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 224: {fileID: 1390609983}
-  - 222: {fileID: 1390609985}
-  - 114: {fileID: 1390609984}
+  - 114: {fileID: 1390609986}
   m_Layer: 5
   m_Name: Controls Page
   m_TagString: Untagged
@@ -1895,7 +1909,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 300, y: 300}
   m_Pivot: {x: .5, y: .5}
---- !u!114 &1390609984
+--- !u!114 &1390609986
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -1903,25 +1917,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1390609982}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Script: {fileID: 11500000, guid: 54f069cbd93dd8646a69ec8d566773f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: .323529422, g: .323529422, b: .323529422, a: 1}
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
---- !u!222 &1390609985
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1390609982}
+  BackButton: {fileID: 1976129919}
+  DefaultButton: {fileID: 1219508027}
 --- !u!1 &1443849453
 GameObject:
   m_ObjectHideFlags: 0

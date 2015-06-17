@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Catharsis.UI.Control;
+using UnityEngine;
 
 namespace Catharsis.UI
 {
@@ -11,6 +12,24 @@ namespace Catharsis.UI
         protected override void mapBindings()
         {
             base.mapBindings();
+
+            //TODO: Create Command
+            injectionBinder.Bind<ShowPauseMenuSignal>().ToSingleton();
+
+            //Signals with no commands.    
+            injectionBinder.Bind<ShowControlPageSignal>().ToSingleton();
+            injectionBinder.Bind<ShowMainPageSignal>().ToSingleton();
+            injectionBinder.Bind<ClosePauseMenuSignal>().ToSingleton();
+
+            //commands
+            commandBinder.Bind<StartSignal>().To<UIStartCommand>();
+            commandBinder.Bind<QuitGameSignal>().To<QuitGameCommand>();
+
+
+            //mediators
+            mediationBinder.Bind<PauseMenuView>().To<PauseMenuMediator>();
+            mediationBinder.Bind<MainPageView>().To<MainPageMediator>();
+            mediationBinder.Bind<ControlPageView>().To<ControlPageMediator>();
         }
 
         protected override void postBindings()
