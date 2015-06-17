@@ -13,10 +13,9 @@ namespace Catharsis.UI
         {
             base.mapBindings();
 
-            //TODO: Create Command
-            injectionBinder.Bind<ShowPauseMenuSignal>().ToSingleton();
 
             //Signals with no commands.    
+            injectionBinder.Bind<ShowPauseMenuSignal>().ToSingleton();
             injectionBinder.Bind<ShowControlPageSignal>().ToSingleton();
             injectionBinder.Bind<ShowMainPageSignal>().ToSingleton();
             injectionBinder.Bind<ClosePauseMenuSignal>().ToSingleton();
@@ -24,6 +23,7 @@ namespace Catharsis.UI
             //commands
             commandBinder.Bind<StartSignal>().To<UIStartCommand>();
             commandBinder.Bind<QuitGameSignal>().To<QuitGameCommand>();
+            commandBinder.Bind<PauseGameSignal>().To<PauseGameCommand>().Pooled();
 
 
             //mediators

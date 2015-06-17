@@ -11,7 +11,7 @@ namespace Catharsis.UI
         public Button ControlsButton;
         public Button QuitButton;
 
-        internal Signal ResumeButtonClickSignal = new Signal ();
+        internal Signal ResumeButtonClickSignal = new Signal();
         internal Signal ControlButtonClickSignal = new Signal();
         internal Signal QuitButtonClickSignal = new Signal();
 
@@ -19,7 +19,7 @@ namespace Catharsis.UI
         {
             ResumeButton.onClick.AddListener(Resume);
             ControlsButton.onClick.AddListener(ShowControlPage);
-            QuitButton.onClick.AddListener(QuitButtonClickSignal.Dispatch);
+            QuitButton.onClick.AddListener(Quit);
         }
 
         internal void Remove()
@@ -37,6 +37,11 @@ namespace Catharsis.UI
         private void ShowControlPage()
         {
             ControlButtonClickSignal.Dispatch();
+        }
+
+        private void Quit()
+        {
+            QuitButtonClickSignal.Dispatch();
         }
     }
 }

@@ -349,10 +349,11 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 1126528180}
   - {fileID: 1286600739}
   - {fileID: 1010757265}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
 --- !u!114 &189974399
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1095,7 +1096,7 @@ Transform:
   m_Children:
   - {fileID: 826921111}
   m_Father: {fileID: 189974398}
-  m_RootOrder: 1
+  m_RootOrder: 2
 --- !u!114 &1010757266
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1250,7 +1251,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &1126528176
 AudioListener:
   m_ObjectHideFlags: 0
@@ -1315,7 +1316,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 189974398}
   m_RootOrder: 0
 --- !u!1 &1204437712
 GameObject:
@@ -1698,7 +1699,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 189974398}
-  m_RootOrder: 0
+  m_RootOrder: 1
 --- !u!114 &1286600740
 MonoBehaviour:
   m_ObjectHideFlags: 0
