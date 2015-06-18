@@ -11,7 +11,7 @@ namespace Catharsis.UI
          public ShowMainPageSignal ShowMainPageSignal { get; set; }
 
 
-        //TODO: create a default command signal
+        //TODO: create a default command & signal
         public override void OnRegister()
         {
             view.BackButtonClickSignal.AddListener(Back);

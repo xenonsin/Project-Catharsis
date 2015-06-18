@@ -6,7 +6,7 @@ namespace Catharsis.UI
 {
     public class UIBootstrap : ContextView
     {
-        public void Start()
+        void Start()
         {
             context = new UIContext(this);
         }

@@ -15,6 +15,8 @@ namespace Catharsis
     //Game
     public class GameStartSignal : Signal { }
     public class GameEndSignal : Signal { }
+
+    public class QuitApplicationSignal : Signal { }
     //public class UpdateScoreSignal : Signal { }
 
 

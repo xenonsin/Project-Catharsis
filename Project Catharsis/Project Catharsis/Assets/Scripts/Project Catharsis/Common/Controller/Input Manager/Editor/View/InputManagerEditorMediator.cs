@@ -40,8 +40,8 @@ namespace Catharsis.InputEditor.View
             {
                 using (System.IO.StringReader reader = new System.IO.StringReader(textAsset.text))
                 {
-                    InputLoader.Load(textAsset,out config, out defaultConfig);
-                    view.ReplaceCurrentConfigurations(defaultConfig,config);
+                   // InputLoader.Load(textAsset,out config, out defaultConfig);
+                  //  view.ReplaceCurrentConfigurations(defaultConfig,config);
                 }
             }
             else

@@ -35,18 +35,25 @@ namespace Catharsis
                 if (inputManager.GetKeyDown(KeyCode.W))//inputManager.GetButtonDown("Forward"))
                 {
                     input |= GameInputEvent.MOVE_FORWARD;
+                    Debug.Log("W");
                 }
                 if (inputManager.GetKeyDown(KeyCode.A))//inputManager.GetButtonDown("Left"))
                 {
                     input |= GameInputEvent.MOVE_LEFT;
+                    Debug.Log("A");
+
                 }
                 if (inputManager.GetKeyDown(KeyCode.S))//inputManager.GetButtonDown("Back"))
                 {
                     input |= GameInputEvent.MOVE_BACKWARD;
+                    Debug.Log("S");
+
                 }
                 if (inputManager.GetKeyDown(KeyCode.D))//inputManager.GetButtonDown("Right"))
                 {
                     input |= GameInputEvent.MOVE_RIGHT;
+                    Debug.Log("D");
+
                 }
              
                 gameInputSignal.Dispatch(input);

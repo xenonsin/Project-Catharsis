@@ -32,18 +32,22 @@ namespace Catharsis
             //    .ToName(GameElement.OBSTACLE_POOL);
 
             //Signals (That are not bound to commands)
-            injectionBinder.Bind<GameStartedSignal>().ToSingleton();
-            injectionBinder.Bind<GameInputSignal>().ToSingleton();
 
             //Commands
             //All Commands get mapped to a Signal that executes them.
+
+            commandBinder.Bind<StartSignal>()
+             .To<GameStartCommand>()
+            .Once();
             if (Context.firstContext == this)
             {
                 //Here we bind the StartSignal to the game start command
                 //which is found in the Controllers folder
-                commandBinder.Bind<StartSignal>()
-                    .To<GameStartCommand>()
-                    .Once();
+
+
+                injectionBinder.Bind<GameStartedSignal>().ToSingleton();
+                injectionBinder.Bind<GameInputSignal>().ToSingleton();
+
             }
            // commandBinder.Bind<DestroyPlayerSignal>().To<DestroyPlayerCommand>().Pooled();
             //commandBinder.Bind<CreateObstacleSignal>().To<CreateObstacleCommand>().Pooled();

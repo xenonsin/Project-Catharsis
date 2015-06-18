@@ -1,5 +1,4 @@
-﻿using System;
-using strange.extensions.mediation.impl;
+﻿using strange.extensions.mediation.impl;
 
 namespace Catharsis.UI
 {

@@ -89,23 +89,23 @@ namespace Catharsis.InputEditor.View
 
             base.OnEnable();
             //Get the serializable input manager
-            _inputManager = AssetDatabase.LoadAssetAtPath(INPUTMANAGER_PATH, typeof (InputManager)) as InputManager;
+            //_inputManager = AssetDatabase.LoadAssetAtPath(INPUTMANAGER_PATH, typeof (InputManager)) as InputManager;
 
-            if (_inputManager == null)
-            {
-                if (!AssetDatabase.IsValidFolder("Assets/Data/" + FOLDER_NAME))
-                {
-                    AssetDatabase.CreateFolder("Assets", "Data");
-                    AssetDatabase.CreateFolder("Assets/Data", FOLDER_NAME);
-                    Debug.Log("hi");
-                }
+            //if (_inputManager == null)
+            //{
+            //    if (!AssetDatabase.IsValidFolder("Assets/Data/" + FOLDER_NAME))
+            //    {
+            //        AssetDatabase.CreateFolder("Assets", "Data");
+            //        AssetDatabase.CreateFolder("Assets/Data", FOLDER_NAME);
+            //        Debug.Log("hi");
+            //    }
 
-                _inputManager = ScriptableObject.CreateInstance<InputManager>();
-                AssetDatabase.CreateAsset(_inputManager, INPUTMANAGER_PATH);
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
+            //    _inputManager = ScriptableObject.CreateInstance<InputManager>();
+            //    AssetDatabase.CreateAsset(_inputManager, INPUTMANAGER_PATH);
+            //    AssetDatabase.SaveAssets();
+            //    AssetDatabase.Refresh();
 
-            }
+           // }
 
             if (_selectionIndex == null)
                 _selectionIndex = new List<int>();
@@ -130,10 +130,10 @@ namespace Catharsis.InputEditor.View
 
         void OnGUI()
         {
-            ValidateGUIStyles();
-            DisplayHierarchyPanel();
-            if (_selectionIndex.Count >= 1)
-                DisplayMainPanel();
+            //ValidateGUIStyles();
+            //DisplayHierarchyPanel();
+            //if (_selectionIndex.Count >= 1)
+            //    DisplayMainPanel();
             DisplayToolbar();
         }
 
@@ -307,7 +307,7 @@ namespace Catharsis.InputEditor.View
             //    InputManager.SetInputConfiguration(inputConfig.name);
             //}
             GUI.enabled = true;
-            EditorUtility.SetDirty(_inputManager);
+//            EditorUtility.SetDirty(_inputManager);
 
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndScrollView();
@@ -362,7 +362,7 @@ namespace Catharsis.InputEditor.View
                 GUI.enabled = true;
             }
 
-            EditorUtility.SetDirty(_inputManager);
+            //EditorUtility.SetDirty(_inputManager);
             GUILayout.EndScrollView();
             GUILayout.EndArea();
         }

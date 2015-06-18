@@ -2,7 +2,11 @@
 
 namespace Catharsis.InputEditor
 {
+    public class InputManagerConfigurationChangedSignal : Signal<string> { }
+    public class InputManagerConfigurationDirtySignal : Signal<string> { }
     public class InputManagerLoadedSignal : Signal { }
     public class InputManagerSavedSignal : Signal { }
+    public class InputManagerRemoteUpdateSignal : Signal { }
+
 
 }

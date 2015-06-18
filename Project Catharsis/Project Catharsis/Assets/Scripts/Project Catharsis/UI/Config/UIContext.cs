@@ -22,7 +22,7 @@ namespace Catharsis.UI
 
             //commands
             commandBinder.Bind<StartSignal>().To<UIStartCommand>();
-            commandBinder.Bind<QuitGameSignal>().To<QuitGameCommand>();
+            commandBinder.Bind<QuitGameSignal>().To<QuitGameCommand>(); //TODO: Might change this.
             commandBinder.Bind<PauseGameSignal>().To<PauseGameCommand>().Pooled();
 
 

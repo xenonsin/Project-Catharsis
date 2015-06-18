@@ -7,7 +7,7 @@ namespace Catharsis.InputEditor
 {
     public interface IInputManager
     {
-        bool ignoreTimeScale { get; set; }
+        bool IgnoreTimeScale { get; set; }
         Vector3 acceleration { get; }
         int accelerationEventCount { get; }
         AccelerationEvent[] accelerationEvents { get; }
