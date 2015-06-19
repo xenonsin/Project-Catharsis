@@ -32,7 +32,7 @@ namespace Catharsis.InputEditor
     [Implements(typeof (IInputManager), InjectionBindingScope.CROSS_CONTEXT)]
     public class InputManager : IInputManager
     {
-
+        #region Injections
 
         [Inject(ContextKeys.CONTEXT_VIEW)]
         public GameObject contextView { get; set; }
@@ -40,7 +40,10 @@ namespace Catharsis.InputEditor
         //TODO: Inject this in ever first context, same with the Input Manager.
 
         [Inject]
-        public IRoutineRunner RoutienRunner { get; set; }
+        public IRoutineRunner RoutineRunner { get; set; }
+
+        [Inject]
+        public IPathUtility PathUtility { get; set; }
 
         //TODO: Hook this up.
         [Inject]
@@ -48,13 +51,18 @@ namespace Catharsis.InputEditor
         [Inject]
         public InputManagerConfigurationDirtySignal ConfigurationDirtySignal { get; set; }
         [Inject]
+        public InputManagerLoadUserInputSignal LoadInputConfigSignal { get; set; }
+        [Inject]
+        public InputManagerSaveSignal SaveInputConfigSignal { get; set; }
+        [Inject]
         public InputManagerLoadedSignal LoadedSignal { get; set; }
         [Inject]
         public InputManagerSavedSignal SavedSignal { get; set; }
         [Inject]
         public InputManagerRemoteUpdateSignal RemoteUpdateSignal { get; set; }
 
-            #region Fields
+        #endregion
+        #region Fields
 
         //Bug: This doesn't allow for configs that are the same name. Doesn't disallow the player to create duplicates.
         [SerializeField]
@@ -135,12 +143,22 @@ namespace Catharsis.InputEditor
             _configurationTable = new Dictionary<string, InputConfiguration>();
             _axesTable = new Dictionary<string, Dictionary<string, AxisConfiguration>>();
 
-            //SEND LOAD SIGNAL TO GET COMMAND..
+            //SEND LOAD SIGNAL TO COMMAND..
+            LoadInputConfigSignal.Dispatch();
+            //ONCE SUCCESSFUL RUN THE INITIALIZATION.
+           
+        }
 
+        public void StartAfterConfigLoaded()
+        {
+#if UNITY_EDITOR
+            Debug.Log("Input Manager is Running.");
+#endif
+            SaveInputConfigSignal.Dispatch();
             SetRawAxisNames();
             Init();
 
-            RoutienRunner.StartCoroutine(update());
+            RoutineRunner.StartCoroutine(update());
         }
 
         private void SetRawAxisNames()
@@ -233,7 +251,7 @@ namespace Catharsis.InputEditor
                         _currentConfiguration.axes[i].Update();
                     }
 
-                    RemoteUpdateSignal.Dispatch();
+                    //RemoteUpdateSignal.Dispatch();
 
                     if (_scanFlags != ScanFlags.None)
                         ScanInput();

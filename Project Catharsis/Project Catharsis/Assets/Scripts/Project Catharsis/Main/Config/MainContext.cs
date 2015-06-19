@@ -14,12 +14,17 @@ namespace Catharsis.Main.Config
 
             if (Context.firstContext == this)
             {
-                //Input Manager Signals
-                injectionBinder.Bind<InputManagerLoadedSignal>().ToSingleton().CrossContext();
+                //Input Manager Signals                
                 injectionBinder.Bind<InputManagerSavedSignal>().ToSingleton().CrossContext();
                 injectionBinder.Bind<InputManagerConfigurationChangedSignal>().ToSingleton().CrossContext();
                 injectionBinder.Bind<InputManagerConfigurationDirtySignal>().ToSingleton().CrossContext();
                 injectionBinder.Bind<InputManagerRemoteUpdateSignal>().ToSingleton().CrossContext();
+
+                //Input Manager Commands
+                commandBinder.Bind<InputManagerLoadUserInputSignal>().To<LoadInputCommand>().Pooled();
+                commandBinder.Bind<InputManagerSaveSignal>().To<SaveInputCommand>().Pooled();
+                commandBinder.Bind<InputManagerLoadedSignal>().To<StartInputManagerCommand>().Pooled();
+                commandBinder.Bind<InputManagerLoadDefaultInputSignal>().To<LoadDefaultInputCommand>().Pooled();
 
                 //Common Signals
                 injectionBinder.Bind<GameInputSignal>().ToSingleton().CrossContext();

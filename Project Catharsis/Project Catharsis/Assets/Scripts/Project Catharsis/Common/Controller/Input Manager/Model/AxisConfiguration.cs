@@ -151,7 +151,8 @@ namespace Catharsis.InputEditor
 
         public void Update() //This shouldn't be here...
         {
-            //_deltaTime = inputManager.ignoreTimeScale ? (Time.realtimeSinceStartup - _lastUpdateTime) : Time.deltaTime;
+            _deltaTime = Time.realtimeSinceStartup - _lastUpdateTime;
+            
             _lastUpdateTime = Time.realtimeSinceStartup;
 
             if (_lastType != type || _lastAxis != axis || _lastJoystick != joystick)

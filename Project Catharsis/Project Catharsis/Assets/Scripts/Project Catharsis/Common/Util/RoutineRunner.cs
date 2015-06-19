@@ -16,7 +16,9 @@ namespace Catharsis
         [PostConstruct]
         public void PostConstruct()
         {
+#if UNITY_EDITOR
             Debug.Log("RoutineRunner is working.");
+#endif
             mb = contextView.AddComponent<RoutineRunnerBehavior>();
         }
 

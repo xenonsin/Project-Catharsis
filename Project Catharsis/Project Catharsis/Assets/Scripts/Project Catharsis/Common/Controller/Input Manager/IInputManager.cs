@@ -7,6 +7,12 @@ namespace Catharsis.InputEditor
 {
     public interface IInputManager
     {
+        void Load(IInputLoader inputLoader);
+
+        void Save(IInputSaver inputSaver);
+
+        void StartAfterConfigLoaded();
+
         bool IgnoreTimeScale { get; set; }
         Vector3 acceleration { get; }
         int accelerationEventCount { get; }
