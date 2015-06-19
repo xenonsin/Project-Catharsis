@@ -1,5 +1,6 @@
 ﻿using System.Security.Policy;
 using Catharsis.InputEditor;
+using Catharsis.InputEditor.UI;
 using strange.extensions.command.impl;
 using UnityEngine;
 
@@ -12,10 +13,11 @@ namespace Catharsis.Main.Controller
        [Inject]
        public IInputManager InputManager { get; set; }
 
+
         public override void Execute()
         {
             Application.LoadLevelAdditive("Game");
-            //Application.LoadLevelAdditive("UI");
+            Application.LoadLevelAdditive("UI");
 
         }
     }

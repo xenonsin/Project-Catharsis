@@ -1,4 +1,5 @@
 ﻿using Catharsis.InputEditor;
+using Catharsis.InputEditor.UI;
 using Catharsis.Main.Controller;
 using UnityEngine;
 using strange.extensions.context.impl;
@@ -33,7 +34,7 @@ namespace Catharsis.Main.Config
                 injectionBinder.Bind<QuitApplicationSignal>().ToSingleton().CrossContext();
 
             }
-
+            //injectionBinder.injector.Inject(StandaloneInputModule);
             commandBinder.Bind<StartSignal>().To<MainStartupCommand>();
         }
 

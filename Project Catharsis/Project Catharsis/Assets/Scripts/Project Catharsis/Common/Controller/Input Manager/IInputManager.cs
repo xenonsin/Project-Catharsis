@@ -13,6 +13,9 @@ namespace Catharsis.InputEditor
 
         void StartAfterConfigLoaded();
 
+        InputConfiguration GetCurrentInputConfiguration();
+        AxisConfiguration GetAxisConfiguration(string inputConfigName, string axisName);
+
         bool IgnoreTimeScale { get; set; }
         Vector3 acceleration { get; }
         int accelerationEventCount { get; }

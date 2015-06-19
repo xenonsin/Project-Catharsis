@@ -139,7 +139,7 @@ namespace Catharsis.InputEditor
         public void PostConstruct()
         {
             _keys = (KeyCode[]) Enum.GetValues(typeof (KeyCode));
-            IgnoreTimeScale = true;
+            IgnoreTimeScale = true; //Currently True.. So when it's paused it can still work.
             _configurationTable = new Dictionary<string, InputConfiguration>();
             _axesTable = new Dictionary<string, Dictionary<string, AxisConfiguration>>();
 
@@ -248,7 +248,7 @@ namespace Catharsis.InputEditor
                     int count = _currentConfiguration.axes.Count;
                     for (int i = 0; i < count; i++)
                     {
-                        _currentConfiguration.axes[i].Update();
+                        _currentConfiguration.axes[i].Update(IgnoreTimeScale);
                     }
 
                     //RemoteUpdateSignal.Dispatch();

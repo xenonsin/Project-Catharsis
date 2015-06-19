@@ -8,9 +8,6 @@ namespace Catharsis
 {
     public class KeyboardInput : IInput
     {
-        [Inject(ContextKeys.CONTEXT_DISPATCHER)]
-        public IEventDispatcher dispatcher { get; set; }
-
         [Inject]
         public IRoutineRunner routineRunner { get; set; }
 
@@ -23,16 +20,25 @@ namespace Catharsis
         [PostConstruct]
         public void PostConstruct()
         {
-            //Debug.Log("hi input");
+            //For Now Run automatically. Would create a command that runs this after gamestart.
             routineRunner.StartCoroutine(Update());
+        }
+
+        //Is called after the InputManager is loaded.
+        private void StartKeyboardInput()
+        {
+            routineRunner.StartCoroutine(Update());
+            
         }
 
         protected IEnumerator Update()
         {
+            //HOW TO START  ?
             //NO WAY TO END ?????
 
             while (true)
             {
+                //Debug.Log(InputManager.mousePosition);
                 int input = GameInputEvent.NONE;
                 //if (InputManager.GetButtonDown("Forward"))
                 //{

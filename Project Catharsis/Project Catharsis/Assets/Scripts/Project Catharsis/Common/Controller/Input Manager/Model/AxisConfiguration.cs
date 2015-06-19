@@ -149,9 +149,9 @@ namespace Catharsis.InputEditor
             _analogButtonState = ButtonState.Released;
         }
 
-        public void Update() //This shouldn't be here...
+        public void Update(bool ignoreTimeScale) //This shouldn't be here...
         {
-            _deltaTime = Time.realtimeSinceStartup - _lastUpdateTime;
+            _deltaTime = ignoreTimeScale ? (Time.realtimeSinceStartup - _lastUpdateTime) : Time.deltaTime;
             
             _lastUpdateTime = Time.realtimeSinceStartup;
 
