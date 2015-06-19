@@ -16,8 +16,9 @@ namespace Catharsis.Main.Controller
 
         public override void Execute()
         {
-            Application.LoadLevelAdditive("Game");
             Application.LoadLevelAdditive("UI");
+
+            Application.LoadLevelAdditive("Game");
 
         }
     }

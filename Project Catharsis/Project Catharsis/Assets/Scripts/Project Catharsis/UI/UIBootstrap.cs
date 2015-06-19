@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using System;
-using strange.extensions.context.impl;
+﻿using strange.extensions.context.impl;
 
 namespace Catharsis.UI
 {

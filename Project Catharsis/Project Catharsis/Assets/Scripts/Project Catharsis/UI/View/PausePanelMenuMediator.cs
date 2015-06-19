@@ -2,13 +2,14 @@
 
 namespace Catharsis.UI
 {
-    public class MainPageMediator : Mediator
+    public class PausePanelMenuMediator : Mediator
     {
         [Inject]
-        public MainPageView view { get; set; }
+        public PausePanelMenuView view { get; set; }
+
 
         [Inject]
-        public ShowControlPageSignal ShowControlPageSignal { get; set; }
+        public ShowOptionPageSignal ShowOptionPageSignal { get; set; }
 
         [Inject]
         public ClosePauseMenuSignal ClosePauseMenuSignal { get; set; }
@@ -16,8 +17,9 @@ namespace Catharsis.UI
         public QuitGameSignal QuitGameSignal { get; set; }
 
         public override void OnRegister()
-        {       
-            view.ControlButtonClickSignal.AddListener(OnControlButtonClick);
+        {
+
+            view.OptionsButtonClickSignal.AddListener(OnControlButtonClick);
             view.QuitButtonClickSignal.AddListener(OnQuickButtonClick);
             view.ResumeButtonClickSignal.AddListener(OnResumeButtonClick);
 
@@ -27,7 +29,8 @@ namespace Catharsis.UI
 
         public override void OnRemove()
         {
-            view.ControlButtonClickSignal.RemoveListener(OnControlButtonClick);
+
+            view.OptionsButtonClickSignal.RemoveListener(OnControlButtonClick);
             view.QuitButtonClickSignal.RemoveListener(OnQuickButtonClick);
             view.ResumeButtonClickSignal.RemoveListener(OnResumeButtonClick);
 
@@ -37,7 +40,7 @@ namespace Catharsis.UI
 
         private void OnControlButtonClick()
         {
-            ShowControlPageSignal.Dispatch();
+            ShowOptionPageSignal.Dispatch();
         }
 
         private void OnQuickButtonClick()

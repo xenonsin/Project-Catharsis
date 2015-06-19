@@ -9,6 +9,7 @@ namespace Catharsis.UI
     {
         public Canvas canvas;
         public GameObject mainPage;
+        public GameObject optionsPage;
         public GameObject controlsPage;
 
         private bool isOpen;
@@ -17,9 +18,9 @@ namespace Catharsis.UI
 
         internal void Init()
         {
-           // isOpen = false;
+            //isOpen = false;
             //canvas.gameObject.SetActive(false);
-            Show();
+           Show();
            
         }
 
@@ -47,13 +48,22 @@ namespace Catharsis.UI
         internal void ChangeToMainPage()
         {
             controlsPage.SetActive(false);
+            optionsPage.SetActive(false);
             mainPage.SetActive(true);
         }
 
         internal void ChangeToControlsPage()
         {
             mainPage.SetActive(false);
+            optionsPage.SetActive(false);
             controlsPage.SetActive(true);
+        }
+
+        internal void ChangeToOptionsPage()
+        {
+            mainPage.SetActive(false);
+            controlsPage.SetActive(false);
+            optionsPage.SetActive(true);
         }
 
 

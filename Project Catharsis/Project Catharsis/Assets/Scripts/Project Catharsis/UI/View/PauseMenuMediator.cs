@@ -18,15 +18,17 @@ namespace Catharsis.UI
 
         [Inject]
         public ShowMainPageSignal ShowMainPageSignal { get; set; }
-        
+        [Inject]
+        public ShowOptionPageSignal ShowOptionPageSignal { get; set; }
         [Inject]
         public ShowControlPageSignal ShowControlPageSignal { get; set; }
         public override void OnRegister()
         {
-            ShowControlPageSignal.AddListener(Show);
+            ShowPauseMenuSignal.AddListener(Show);
             ClosePauseMenuSignal.AddListener(Close);
             ShowMainPageSignal.AddListener(ChangeToMainPage);
             ShowControlPageSignal.AddListener(ChangeToControlPage);
+            ShowOptionPageSignal.AddListener(ChangeToOptionsPage);
             view.Init();
             base.OnRegister();
         }
@@ -34,10 +36,12 @@ namespace Catharsis.UI
         public override void OnRemove()
         {
 
-            ShowControlPageSignal.RemoveListener(Show);
+            ShowPauseMenuSignal.RemoveListener(Show);
             ClosePauseMenuSignal.RemoveListener(Close);
             ShowMainPageSignal.RemoveListener(ChangeToMainPage);
             ShowControlPageSignal.RemoveListener(ChangeToControlPage);
+            ShowOptionPageSignal.RemoveListener(ChangeToOptionsPage);
+
             base.OnRemove();
         }
 
@@ -62,6 +66,10 @@ namespace Catharsis.UI
             view.ChangeToControlsPage();
         }
 
+        private void ChangeToOptionsPage()
+        {
+            view.ChangeToOptionsPage();
+        }
 
     }
 }

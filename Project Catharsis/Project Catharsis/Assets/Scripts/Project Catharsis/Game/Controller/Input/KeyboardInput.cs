@@ -3,6 +3,7 @@ using strange.extensions.dispatcher.eventdispatcher.api;
 using UnityEngine;
 using System.Collections;
 using Catharsis.InputEditor;
+using Catharsis.UI;
 
 namespace Catharsis
 {
@@ -16,6 +17,9 @@ namespace Catharsis
 
         [Inject]
         public IInputManager InputManager { get; set; }
+
+        [Inject]
+        public ShowPauseMenuSignal ShowPauseMenuSignal { get; set; }
 
         [PostConstruct]
         public void PostConstruct()
@@ -63,6 +67,9 @@ namespace Catharsis
                 //    Debug.Log("D");
 
                 //}
+
+                if (InputManager.GetButtonDown("PauseMenu"))
+                    ShowPauseMenuSignal.Dispatch();
              
                 gameInputSignal.Dispatch(input);
                 yield return null;

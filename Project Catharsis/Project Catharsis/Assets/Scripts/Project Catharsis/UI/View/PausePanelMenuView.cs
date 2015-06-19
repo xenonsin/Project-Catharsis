@@ -1,31 +1,30 @@
-﻿using strange.extensions.mediation.impl;
+﻿using System;
+using strange.extensions.mediation.impl;
 using strange.extensions.signal.impl;
 using UnityEngine.UI;
-using UnityEngine;
 
 namespace Catharsis.UI
 {
-    public class MainPageView : View
+    public class PausePanelMenuView : View
     {
         public Button ResumeButton;
-        public Button ControlsButton;
+        public Button OptionsButton;
         public Button QuitButton;
-
         internal Signal ResumeButtonClickSignal = new Signal();
-        internal Signal ControlButtonClickSignal = new Signal();
+        internal Signal OptionsButtonClickSignal = new Signal();
         internal Signal QuitButtonClickSignal = new Signal();
 
         internal void Init()
         {
             ResumeButton.onClick.AddListener(Resume);
-            ControlsButton.onClick.AddListener(ShowControlPage);
+            OptionsButton.onClick.AddListener(ShowControlPage);
             QuitButton.onClick.AddListener(Quit);
         }
 
         internal void Remove()
         {
             ResumeButton.onClick.RemoveAllListeners();
-            ControlsButton.onClick.RemoveAllListeners();
+            OptionsButton.onClick.RemoveAllListeners();
             QuitButton.onClick.RemoveAllListeners();
         }
 
@@ -36,7 +35,7 @@ namespace Catharsis.UI
 
         private void ShowControlPage()
         {
-            ControlButtonClickSignal.Dispatch();
+            OptionsButtonClickSignal.Dispatch();
         }
 
         private void Quit()
