@@ -1,4 +1,5 @@
-﻿using strange.extensions.mediation.impl;
+﻿using Catharsis.InputEditor;
+using strange.extensions.mediation.impl;
 
 namespace Catharsis.UI
 {
@@ -13,6 +14,8 @@ namespace Catharsis.UI
         [Inject]
         public ShowMainPageSignal ShowMainPageSignal { get; set; }
 
+
+
         public override void OnRegister()
         {
             view.ControlsButtonClickSignal.AddListener(OnControlButtonClick);
@@ -25,6 +28,7 @@ namespace Catharsis.UI
         {
             view.ControlsButtonClickSignal.RemoveListener(OnControlButtonClick);
             view.BackButtonClickSignal.RemoveListener(OnBackButtonClick);
+
             view.Remove();
             base.OnRemove();
         }
@@ -38,5 +42,6 @@ namespace Catharsis.UI
         {
             ShowMainPageSignal.Dispatch();
         }
+
     }
 }

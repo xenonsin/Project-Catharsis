@@ -110,8 +110,8 @@ namespace Catharsis.InputEditor.UI
         public override void UpdateModule()
         {
 
-               m_LastMousePosition = m_MousePosition;
-               m_MousePosition = InputManager.mousePosition;
+              m_LastMousePosition = m_MousePosition;
+             m_MousePosition = InputManager.mousePosition;
             
         }
 

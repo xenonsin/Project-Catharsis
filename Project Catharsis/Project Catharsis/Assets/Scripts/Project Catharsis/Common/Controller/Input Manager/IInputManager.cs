@@ -7,6 +7,8 @@ namespace Catharsis.InputEditor
 {
     public interface IInputManager
     {
+        bool IsScanning { get; }
+        void StartScan(ScanSettings settings, ScanHandler scanHandler);
         void Load(IInputLoader inputLoader);
 
         void Save(IInputSaver inputSaver);

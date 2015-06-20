@@ -1,4 +1,6 @@
-﻿using strange.extensions.mediation.impl;
+﻿using Catharsis.InputEditor;
+using Catharsis.InputEditor.UI;
+using strange.extensions.mediation.impl;
 using strange.extensions.signal.impl;
 using UnityEngine.UI;
 
@@ -8,6 +10,7 @@ namespace Catharsis.UI
     {
         public Button ControlsButton;
         public Button BackButton;
+
         internal Signal ControlsButtonClickSignal = new Signal();
         internal Signal BackButtonClickSignal = new Signal();
 
@@ -15,6 +18,8 @@ namespace Catharsis.UI
         {
             ControlsButton.onClick.AddListener(ShowControlPage);
             BackButton.onClick.AddListener(ShowPauseMenu);
+
+
         }
         internal void Remove()
         {
@@ -32,5 +37,7 @@ namespace Catharsis.UI
         {
             BackButtonClickSignal.Dispatch();
         }
+
+
     }
 }

@@ -18,9 +18,9 @@ namespace Catharsis.UI
 
         internal void Init()
         {
-            //isOpen = false;
-            //canvas.gameObject.SetActive(false);
-           Show();
+            isOpen = false;
+            canvas.gameObject.SetActive(false);
+           //Show();
            
         }
 

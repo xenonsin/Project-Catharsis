@@ -278,6 +278,8 @@ namespace Catharsis.InputEditor
 
         private void RaiseLoadedEvent()
         {
+            //I Removed the command associated with this.. Because I had to make the signal cross context.
+            StartAfterConfigLoaded();
             LoadedSignal.Dispatch();
         }
 
@@ -1025,8 +1027,9 @@ namespace Catharsis.InputEditor
             throw new ArgumentNullException("inputLoader");
 
         inputLoader.Load(out _inputConfigurations, out defaultConfiguration);
-        Init();
         RaiseLoadedEvent();
+
+        Init();
     }
 
         #region [UNITY Interface]

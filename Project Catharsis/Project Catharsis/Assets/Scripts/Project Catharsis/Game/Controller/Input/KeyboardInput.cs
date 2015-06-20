@@ -68,6 +68,9 @@ namespace Catharsis
 
                 //}
 
+                var directionVector = new Vector3(InputManager.GetAxis("Horizontal"), 0, InputManager.GetAxis("Vertical"));
+                Debug.Log(directionVector);
+
                 if (InputManager.GetButtonDown("PauseMenu"))
                     ShowPauseMenuSignal.Dispatch();
              

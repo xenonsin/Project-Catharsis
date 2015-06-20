@@ -16,6 +16,7 @@ namespace Catharsis.UI.Control
 
         public override void Execute()
         {
+            //Debug.Log("hi");
             //It's a monobehavior so this needs to be done!
             //https://groups.google.com/forum/#!topic/strangeioc/7h_-w90GtQw
             IStandaloneInputModule standaloneInputModule = contextView.AddComponent<StandaloneInputModule>();
