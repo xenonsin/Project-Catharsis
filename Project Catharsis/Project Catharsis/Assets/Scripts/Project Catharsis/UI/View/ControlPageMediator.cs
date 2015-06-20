@@ -18,6 +18,11 @@ namespace Catharsis.UI
         public InputManagerConfigurationDirtySignal DirtySignal { get; set; }
 
         [Inject]
+        public InputManagerLoadDefaultInputSignal LoadDefaultInputSignal { get; set; }
+
+        //[Inject]
+
+        [Inject]
         public IInputManager InputManager { get; set; }
 
 
@@ -25,6 +30,7 @@ namespace Catharsis.UI
         public override void OnRegister()
         {          
             view.BackButtonClickSignal.AddListener(Back);
+            view.DefaultButtonClickSignal.AddListener(LoadDefault);
             LoadedSignal.AddListener(InputManagerDoneLoading);
             DirtySignal.AddListener(InputManagerHandleDirty);
             view.Init(InputManager);
@@ -45,6 +51,11 @@ namespace Catharsis.UI
         private void Back()
         {
             ShowMainPageSignal.Dispatch();
+        }
+
+        private void LoadDefault()
+        {
+            LoadDefaultInputSignal.Dispatch();
         }
 
         private void InputManagerDoneLoading()

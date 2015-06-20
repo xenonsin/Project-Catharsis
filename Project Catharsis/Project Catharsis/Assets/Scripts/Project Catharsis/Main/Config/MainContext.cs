@@ -21,6 +21,8 @@ namespace Catharsis.Main.Config
                 injectionBinder.Bind<InputManagerConfigurationDirtySignal>().ToSingleton().CrossContext();
                 injectionBinder.Bind<InputManagerRemoteUpdateSignal>().ToSingleton().CrossContext();
                 injectionBinder.Bind<InputManagerLoadedSignal>().ToSingleton().CrossContext();
+                injectionBinder.Bind<InputManagerLoadDefaultInputSignal>().ToSingleton().CrossContext();
+                injectionBinder.Bind<InputManagerSaveSignal>().ToSingleton().CrossContext();
 
                 //Input Manager Commands
                 commandBinder.Bind<InputManagerLoadUserInputSignal>().To<LoadInputCommand>().Pooled();

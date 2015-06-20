@@ -20,11 +20,13 @@ namespace Catharsis.UI
                 injectionBinder.Bind<InputManagerConfigurationChangedSignal>().ToSingleton().CrossContext();
                 injectionBinder.Bind<InputManagerConfigurationDirtySignal>().ToSingleton().CrossContext();
                 injectionBinder.Bind<InputManagerRemoteUpdateSignal>().ToSingleton().CrossContext();
+                injectionBinder.Bind<InputManagerLoadedSignal>().ToSingleton().CrossContext();
+                injectionBinder.Bind<InputManagerLoadDefaultInputSignal>().ToSingleton().CrossContext();
 
                 //Input Manager Commands
                 commandBinder.Bind<InputManagerLoadUserInputSignal>().To<LoadInputCommand>().Pooled();
                 commandBinder.Bind<InputManagerSaveSignal>().To<SaveInputCommand>().Pooled();
-                commandBinder.Bind<InputManagerLoadedSignal>().To<StartInputManagerCommand>().Pooled();
+                //commandBinder.Bind<InputManagerLoadedSignal>().To<StartInputManagerCommand>().Pooled();
                 commandBinder.Bind<InputManagerLoadDefaultInputSignal>().To<LoadDefaultInputCommand>().Pooled();
 
                 //Common Signals

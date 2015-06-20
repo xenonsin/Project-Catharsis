@@ -278,8 +278,6 @@ namespace Catharsis.InputEditor
 
         private void RaiseLoadedEvent()
         {
-            //I Removed the command associated with this.. Because I had to make the signal cross context.
-            StartAfterConfigLoaded();
             LoadedSignal.Dispatch();
         }
 
@@ -1028,7 +1026,9 @@ namespace Catharsis.InputEditor
 
         inputLoader.Load(out _inputConfigurations, out defaultConfiguration);
         RaiseLoadedEvent();
-
+        //I Removed the command associated with this.. Because I had to make the signal cross context.
+        //But i can bind the signal again to the command.. So I can leave this function as a one job
+        StartAfterConfigLoaded();
         Init();
     }
 
