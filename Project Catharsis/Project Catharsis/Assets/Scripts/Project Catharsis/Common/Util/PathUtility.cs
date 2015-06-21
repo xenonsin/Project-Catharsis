@@ -18,7 +18,7 @@ namespace Catharsis
 
         public string GetDefaultInputSaveFolder()
         {
-            return string.Format("{0}/InputManager", Application.persistentDataPath);
+            return string.Format("{0}/Resources/InputManager", Application.dataPath);
             
         }
     }

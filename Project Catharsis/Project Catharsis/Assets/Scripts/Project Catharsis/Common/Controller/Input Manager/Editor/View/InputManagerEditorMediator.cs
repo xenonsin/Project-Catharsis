@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using Catharsis.InputEditor.Service;
 using strange.extensions.editor.impl;
 using UnityEditor;
@@ -12,13 +13,19 @@ namespace Catharsis.InputEditor.View
         public InputManagerEditorView view { get; set; }
 
 
+        //[Inject]
+        //public IInputLoader InputLoader { get; set; }
+
+        //[Inject]
+        //public IInputSaver InputSaver { get; set; }
+
         [Inject]
-        public IInputLoader InputLoader { get; set; }
+        public IPathUtility PathUtility { get; set; }
         public override void OnRegister()
         {
             base.OnRegister();
-            view.SendLoadPathSignal.AddListener(OnLoadInputSignal);
-            //view.SaveInputSignal.AddListener(OnSaveInputSignal());
+            view.LoadInputConfigSignal.AddListener(OnLoadInputSignal);
+            view.SaveInputConfigSignal.AddListener(OnSaveInputSignal);
             //LoadInputSignal.AddListener(OnLoadInputSignal);
             //SaveInputSignal.AddListener(OnSaveInputSignal);
         }
@@ -26,23 +33,24 @@ namespace Catharsis.InputEditor.View
         public override void OnRemove()
         {
             base.OnRemove();
-            view.SendLoadPathSignal.RemoveListener(OnLoadInputSignal);
+         //   view.SendLoadPathSignal.RemoveListener(OnLoadInputSignal);
            // SaveInputSignal.RemoveListener(OnSaveInputSignal);
         }
 
-        private void OnLoadInputSignal(string path)
+        //Would be great if these were commands.......
+        private void OnLoadInputSignal()
         {
-            string defaultConfig = "";
-            List<InputConfiguration> config;
 
-            TextAsset textAsset = Resources.Load<TextAsset>(path);
+            TextAsset textAsset = Resources.Load("InputManager/default_input") as TextAsset;
             if (textAsset != null)
             {
-                using (System.IO.StringReader reader = new System.IO.StringReader(textAsset.text))
-                {
-                   // InputLoader.Load(textAsset,out config, out defaultConfig);
-                  //  view.ReplaceCurrentConfigurations(defaultConfig,config);
-                }
+                string defaultConfig = "";
+                List<InputConfiguration> configs = new List<InputConfiguration>();
+
+                //Currently Not using the injections..
+                InputLoaderXML loader = new InputLoaderXML(new StringReader(textAsset.text));
+                loader.Load(out configs,out defaultConfig);
+                view.SetCurrentConfigurations(configs,defaultConfig);
             }
             else
             {
@@ -50,7 +58,24 @@ namespace Catharsis.InputEditor.View
             }
         }
 
-        private void OnSaveInputSignal(string path)
+        private void OnSaveInputSignal(List<InputConfiguration> configs, string defaultConfig )
+        {
+            string saveFolder = PathUtility.GetDefaultInputSaveFolder();
+            if (!System.IO.Directory.Exists(saveFolder))
+                System.IO.Directory.CreateDirectory(saveFolder);
+
+            //Currently Not using the injections..
+            InputSaverXML saver = new InputSaverXML(saveFolder + "/default_input.xml");
+            saver.Save(configs,defaultConfig);
+		
+        }
+
+        private void OnExportInputSignal(List<InputConfiguration> configs, string defaultConfig)
+        {
+            
+        }
+
+        private void OnImportInputSignal()
         {
             
         }

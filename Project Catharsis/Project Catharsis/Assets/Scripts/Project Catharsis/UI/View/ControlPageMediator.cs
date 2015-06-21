@@ -20,13 +20,16 @@ namespace Catharsis.UI
         [Inject]
         public InputManagerLoadDefaultInputSignal LoadDefaultInputSignal { get; set; }
 
+        [Inject]
+        public InputManagerSaveSignal SaveSignal { get; set; }
+
         //[Inject]
 
         [Inject]
         public IInputManager InputManager { get; set; }
 
 
-        //TODO: create a default command & signal
+        //TODO: When I press escape, call the back command.
         public override void OnRegister()
         {          
             view.BackButtonClickSignal.AddListener(Back);
@@ -50,6 +53,7 @@ namespace Catharsis.UI
 
         private void Back()
         {
+            SaveSignal.Dispatch();
             ShowMainPageSignal.Dispatch();
         }
 

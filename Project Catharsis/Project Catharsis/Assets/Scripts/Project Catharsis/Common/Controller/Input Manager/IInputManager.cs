@@ -1,6 +1,7 @@
 ﻿
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Catharsis.InputEditor
@@ -9,6 +10,15 @@ namespace Catharsis.InputEditor
     {
         bool IsScanning { get; }
         void StartScan(ScanSettings settings, ScanHandler scanHandler);
+        List<InputConfiguration> GetAllInputConfigurations();
+        void RemoveAxisConfig(int inputIndex, int axisIndex);
+        void RemoveInputConfig(int inputIndex);
+        void RemoveAll();
+
+        void AddInputConfiguration(InputConfiguration config);
+        void InsertInputConfiguration(int index, InputConfiguration config);
+        
+        string GetDefaultConfiguration();
         void Load(IInputLoader inputLoader);
 
         void Save(IInputSaver inputSaver);

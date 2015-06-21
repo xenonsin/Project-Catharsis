@@ -1,4 +1,14 @@
-﻿using strange.extensions.editor.impl;
+﻿/*
+ * The Purpose of this Editor is to edit the contents of the Default Input Config. This is the main configurations that will ship
+ * with the game, and would represent the configs that would be loaded when the user presses the "Defaults" Button in the control
+ * options menu.
+ * 
+ * Work in Progress Features:
+ * Right Click (Context) Menus that make it more intuitive to delete, copy, and add new configs directly to the Hiearchy Menu.
+ */
+
+
+using strange.extensions.editor.impl;
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -8,23 +18,32 @@ using strange.extensions.signal.impl;
 
 namespace Catharsis.InputEditor.View
 {
+
+
     public sealed class InputManagerEditorView : EditorView
     {
         #region Signals
-        internal Signal<string> SendLoadPathSignal = new Signal<string>();
-        internal Signal<string> SendSaveInputPathSignal = new Signal<string>();
+        internal Signal LoadInputConfigSignal = new Signal();
+        internal Signal<List<InputConfiguration>, string> SaveInputConfigSignal = new Signal<List<InputConfiguration>, string>();
         #endregion
 
         #region Menu Options
         public enum FileMenuOptions
         {
-            NewInputConfiguration = 0, NewAxisConfiguration, Export, Import, OverriteInputSettings, CreateDefaultInputConfig,
+            NewInputConfiguration = 0, NewAxisConfiguration, Export, Import, OverriteInputSettings, CreateDefaultInputConfig, Save,
         }
+
+        public enum EditMenuOptions
+        {
+            Duplicate, Delete, DeleteAll, Copy, Paste
+        }
+
         #endregion
 
 
         #region Fields
 
+        [SerializeField]
         private InputManager _inputManager;
         [SerializeField]
         private List<int> _selectionIndex;
@@ -48,9 +67,12 @@ namespace Catharsis.InputEditor.View
         [SerializeField]
         private string _keyString = string.Empty;
 
+        private AxisConfiguration _copySource;
         private GUIStyle _whiteLabel;
         private GUIStyle _whiteFoldout;
         private GUIStyle _warningLabel;
+
+        private bool Loaded = false;
 
         private bool _isResizingHierarchy = false;
         private bool _editingPositiveKey = false;
@@ -58,7 +80,7 @@ namespace Catharsis.InputEditor.View
         private bool _editingNegativeKey = false;
         private bool _editingAltNegativeKey = false;
 
-        private float _toolbarHeight = 20.0f;
+        private float _toolbarHeight = 18.0f;
         private float _minCursorRectWidth = 10.0f;
         private float _maxCursorRectWidth = 50.0f;
         private float _hierarchyItemHeight = 18.0f;
@@ -72,6 +94,9 @@ namespace Catharsis.InputEditor.View
 
         private const float _menuWidth = 100.0f;
         private const float _minHierarchyPanelWidth = 150.0f;
+
+        private bool clickingWithMouse = false;
+
         #endregion
 
 
@@ -88,30 +113,20 @@ namespace Catharsis.InputEditor.View
         {
 
             base.OnEnable();
-            //Get the serializable input manager
-            //_inputManager = AssetDatabase.LoadAssetAtPath(INPUTMANAGER_PATH, typeof (InputManager)) as InputManager;
-
-            //if (_inputManager == null)
-            //{
-            //    if (!AssetDatabase.IsValidFolder("Assets/Data/" + FOLDER_NAME))
-            //    {
-            //        AssetDatabase.CreateFolder("Assets", "Data");
-            //        AssetDatabase.CreateFolder("Assets/Data", FOLDER_NAME);
-            //        Debug.Log("hi");
-            //    }
-
-            //    _inputManager = ScriptableObject.CreateInstance<InputManager>();
-            //    AssetDatabase.CreateAsset(_inputManager, INPUTMANAGER_PATH);
-            //    AssetDatabase.SaveAssets();
-            //    AssetDatabase.Refresh();
-
-           // }
-
             if (_selectionIndex == null)
                 _selectionIndex = new List<int>();
             if (_highlightTexture == null)
                 CreateHighlightTexture();
+            if (_inputManager == null)
+            {
+                _inputManager = new InputManager();
+                LoadInputConfiguration();
+            }
+
+
         }
+
+
 
         private void OnDisable()
         {
@@ -119,6 +134,17 @@ namespace Catharsis.InputEditor.View
             Texture2D.DestroyImmediate(_highlightTexture);
             _highlightTexture = null;
 
+        }
+
+        private void LoadInputConfiguration()
+        {
+            LoadInputConfigSignal.Dispatch();
+        }
+
+        public void SaveInputConfiguration()
+        {
+            SaveInputConfigSignal.Dispatch(_inputManager.GetAllInputConfigurations(),
+                _inputManager.GetDefaultConfiguration());
         }
 
         private void CreateHighlightTexture()
@@ -130,10 +156,15 @@ namespace Catharsis.InputEditor.View
 
         void OnGUI()
         {
-            //ValidateGUIStyles();
-            //DisplayHierarchyPanel();
-            //if (_selectionIndex.Count >= 1)
-            //    DisplayMainPanel();
+            if (Loaded)
+            {
+                ValidateGUIStyles();
+                DisplayHierarchyPanel();
+                if (_selectionIndex.Count >= 1)
+                     DisplayMainPanel();
+            }
+            UpdateHierarchyPanelWidth();
+            
             DisplayToolbar();
         }
 
@@ -171,7 +202,7 @@ namespace Catharsis.InputEditor.View
             GUI.Box(screenRect, "");
             GUILayout.BeginArea(scrollView);
             _hierarchyScrollPos = EditorGUILayout.BeginScrollView(_hierarchyScrollPos);
-            //GUILayout.Space(5.0f);
+            GUILayout.Space(5.0f);
 
             for (int i = 0; i < _inputManager.GetInputConfigurationCount(); i++)
             {
@@ -190,24 +221,30 @@ namespace Catharsis.InputEditor.View
             GUILayout.EndArea();
         }
 
+        void Update()
+        { }
+
         // TODO: Add right clicking contextual menu so that they can quickly add new axes etc.
         void DisplayHierarchyInputConfigItem(Rect rect, int index, string name)
         {
             Rect configPos = GUILayoutUtility.GetRect(new GUIContent(name), EditorStyles.foldout, GUILayout.Height(_hierarchyItemHeight));
 
             //This is where we handle the selection of the configs.
-            if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
+            if (Event.current.type == EventType.MouseDown)
             {
-                if (configPos.Contains(Event.current.mousePosition))
+                if (Event.current.button == 0)
                 {
-                    _selectionIndex.Clear();
-                    _selectionIndex.Add(index);
-                    Repaint();
-                }
-                else if (rect.Contains(Event.current.mousePosition))
-                {
-                    _selectionIndex.Clear();
-                    Repaint();
+                    if (configPos.Contains(Event.current.mousePosition))
+                    {
+                        _selectionIndex.Clear();
+                        _selectionIndex.Add(index);
+                        Repaint();
+                    }
+                    else if (rect.Contains(Event.current.mousePosition))
+                    {
+                        _selectionIndex.Clear();
+                        Repaint();
+                    }
                 }
             }
 
@@ -224,6 +261,26 @@ namespace Catharsis.InputEditor.View
             {
                 _inputManager.GetInputConfiguration(index).isExpanded = EditorGUI.Foldout(configPos, _inputManager.GetInputConfiguration(index).isExpanded, name);
             }
+        }
+
+        void CreateInputConfigContextMenu()
+        {
+            GenericMenu contextMenu = new GenericMenu();
+            contextMenu.AddItem(new GUIContent("New Axis Configuration"), false, HandleFileMenuOption,
+                FileMenuOptions.NewAxisConfiguration);
+            contextMenu.AddItem(new GUIContent("Delete                Del"), false, HandleEditMenuOption,
+                EditMenuOptions.Delete);
+            contextMenu.ShowAsContext();
+
+        }
+
+        void CreateAxisConfigContextMenu()
+        {
+            GenericMenu contextMenu = new GenericMenu();
+            //contextMenu.AddItem(new GUIContent("New Axis Configuration"), false, HandleFileMenuOption, FileMenuOptions.NewAxisConfiguration);
+            contextMenu.AddItem(new GUIContent("Delete                Del"), false, HandleEditMenuOption, EditMenuOptions.Delete);
+            contextMenu.ShowAsContext();
+           
         }
 
         void DisplayHierarchiAxisConfigItem(Rect rect, int inputConfigIndex, int index, string name)
@@ -256,9 +313,11 @@ namespace Catharsis.InputEditor.View
             {
                 if (_highlightTexture == null)
                 {
-                    CreateHighlightTexture();
+                        CreateHighlightTexture();
                 }
-                GUI.DrawTexture(configPos, _highlightTexture, ScaleMode.StretchToFill);
+                if (Event.current.type == EventType.Repaint)
+
+                    GUI.DrawTexture(configPos, _highlightTexture, ScaleMode.StretchToFill);
 
                 configPos.x += 20.0f;
                 EditorGUI.LabelField(configPos, name, _whiteLabel);
@@ -389,14 +448,25 @@ namespace Catharsis.InputEditor.View
             Rect screenRect = new Rect(0.0f,0.0f, position.width, _toolbarHeight); //This rect encompasses the toolbars
             Rect fileMenuRect = new Rect(0.0f, 0.0f, _menuWidth, screenRect.height); //This rect is the dimensions of the FileMenu drop down
             Rect editMenuRect = new Rect(fileMenuRect.xMax, 0.0f, _menuWidth, screenRect.height); //this rect is the dimensiosn of the EditMenu drop down
-            Rect paddingLabelRect = new Rect(editMenuRect.xMax, 0.0f, screenRect.width - _menuWidth * 2, screenRect.height); //This rect is the dimensions of the padding after the drop down menus
+            Rect saveFieldRect = new Rect(editMenuRect.xMax, 0.0f, _menuWidth, screenRect.height);
+
+            Rect paddingLabelRect = new Rect(saveFieldRect.xMax, 0.0f, screenRect.width - _menuWidth * 2, screenRect.height); //This rect is the dimensions of the padding after the drop down menus
+
+
 
             GUI.BeginGroup(screenRect);
             DisplayFileMenu(fileMenuRect);
             DisplayEditMenu(editMenuRect);
+            DisplaySaveButton(saveFieldRect);
             EditorGUI.LabelField(paddingLabelRect, "", EditorStyles.toolbarButton); //This displays the padding after the menus.
             GUI.EndGroup();
 
+        }
+
+        private void DisplaySaveButton(Rect rect)
+        {
+            if (GUI.Button(rect, "Save", EditorStyles.toolbarButton))
+                Save();
         }
 
         private void DisplayFileMenu(Rect rect)
@@ -417,13 +487,78 @@ namespace Catharsis.InputEditor.View
             fileMenu.AddItem(new GUIContent("Overwrite Input Settings"), false, HandleFileMenuOption, FileMenuOptions.OverriteInputSettings);
             fileMenu.AddItem(new GUIContent("Default Input Configuration"), false, HandleFileMenuOption, FileMenuOptions.CreateDefaultInputConfig);
             fileMenu.AddItem(new GUIContent("New Input Configuration") , false, HandleFileMenuOption, FileMenuOptions.NewInputConfiguration);
-            fileMenu.AddItem(new GUIContent("New Axis Configuration"), false, HandleFileMenuOption, FileMenuOptions.NewAxisConfiguration);
+            if (_selectionIndex.Count >= 1)
+                fileMenu.AddItem(new GUIContent("New Axis Configuration"), false, HandleFileMenuOption, FileMenuOptions.NewAxisConfiguration);
+            else
+                fileMenu.AddDisabledItem(new GUIContent("New Axis"));
 
             fileMenu.AddSeparator("");
             fileMenu.AddItem(new GUIContent("Import"), false, HandleFileMenuOption, FileMenuOptions.Import);
             fileMenu.AddItem(new GUIContent("Export"), false, HandleFileMenuOption, FileMenuOptions.Export);
+            fileMenu.AddSeparator("");
+            fileMenu.AddItem(new GUIContent("Save"), false, HandleFileMenuOption, FileMenuOptions.Save);
+
 
             fileMenu.DropDown(rect);
+        }
+
+
+
+        private void DisplayEditMenu(Rect rect)
+        {
+            EditorGUI.LabelField(rect, "Edit", EditorStyles.toolbarDropDown);
+            if (Event.current.type == EventType.MouseDown && Event.current.button == 0 &&
+                rect.Contains(Event.current.mousePosition))
+            {
+                CreateEditMenu(new Rect(rect.x, rect.yMax, 0.0f, 0.0f));
+            }
+
+            if (Event.current.type == EventType.KeyDown)
+            {
+                if (Event.current.keyCode == KeyCode.D && Event.current.shift)
+                {
+                    Duplicate();
+                    Event.current.Use();
+                }
+                if (Event.current.keyCode == KeyCode.Delete)
+                {
+                    Delete();
+                    Event.current.Use();
+                }
+            }
+        }
+
+        private void CreateEditMenu(Rect rect)
+        {
+            GenericMenu editMenu = new GenericMenu();
+            if (_selectionIndex.Count > 0)
+                editMenu.AddItem(new GUIContent("Duplicate          Shift+D"), false, HandleEditMenuOption, EditMenuOptions.Duplicate);
+            else
+                editMenu.AddDisabledItem(new GUIContent("Duplicate          Shift+D"));
+
+            if (_selectionIndex.Count > 0)
+                editMenu.AddItem(new GUIContent("Delete                Del"), false, HandleEditMenuOption, EditMenuOptions.Delete);
+            else
+                editMenu.AddDisabledItem(new GUIContent("Delete                Del"));
+
+            if (_inputManager.GetInputConfigurationCount() > 0)
+                editMenu.AddItem(new GUIContent("Delete All"), false, HandleEditMenuOption, EditMenuOptions.DeleteAll);
+            else
+                editMenu.AddDisabledItem(new GUIContent("Delete All"));
+
+            if (_selectionIndex.Count >= 2)
+                editMenu.AddItem(new GUIContent("Copy"), false, HandleEditMenuOption, EditMenuOptions.Copy);
+            else
+                editMenu.AddDisabledItem(new GUIContent("Copy"));
+
+            if (_copySource != null && _selectionIndex.Count >= 2)
+                editMenu.AddItem(new GUIContent("Paste"), false, HandleEditMenuOption, EditMenuOptions.Paste);
+            else
+                editMenu.AddDisabledItem(new GUIContent("Paste"));
+
+            //editMenu.AddSeparator("");
+            editMenu.DropDown(rect);
+
         }
 
         private void HandleFileMenuOption(object arg)
@@ -449,7 +584,97 @@ namespace Catharsis.InputEditor.View
                     case FileMenuOptions.Export:
                         ExportInputConfigurations();
                         break;
+                    case FileMenuOptions.Save:
+                        Save();
+                        break;
             }
+        }
+
+        private void HandleEditMenuOption(object arg)
+        {
+            EditMenuOptions option = (EditMenuOptions)arg;
+            switch (option)
+            {
+                case EditMenuOptions.Duplicate:
+                    Duplicate();
+                    break;
+                case EditMenuOptions.Delete:
+                    Delete();
+                    break;
+                case EditMenuOptions.DeleteAll:
+                    DeleteAll();
+                    break;
+                case EditMenuOptions.Copy:
+                    CopySelectedAxisConfig();
+                    break;
+                case EditMenuOptions.Paste:
+                    PasteAxisConfig();
+                    break;
+            }
+        }
+        private void Save()
+        {
+            bool cont = EditorUtility.DisplayDialog("Save?", "This operation will save all modifications to the default input file!\nDo you want to continue?", "Yes", "No");
+            if (!cont) return;
+            Debug.Log("hi");
+            SaveInputConfigSignal.Dispatch(_inputManager.GetAllInputConfigurations(), _inputManager.GetDefaultConfiguration());
+            
+        }
+
+        private void Duplicate()
+        {
+            if (_selectionIndex.Count == 1)
+            {
+                DuplicateInputConfiguration();
+            }
+            else if (_selectionIndex.Count == 2)
+            {
+                DuplicateAxisConfiguration();
+            }
+        }
+
+        private void DuplicateAxisConfiguration()
+        {
+            InputConfiguration inputConfig = _inputManager.GetInputConfiguration(_selectionIndex[0]);
+            AxisConfiguration source = inputConfig.axes[_selectionIndex[1]];
+            AxisConfiguration axisConfig = AxisConfiguration.Duplicate(source);
+            if (_selectionIndex[1] < inputConfig.axes.Count - 1)
+            {
+                inputConfig.axes.Insert(_selectionIndex[1], axisConfig);
+                _selectionIndex[1]++;
+            }
+            else
+            {
+                inputConfig.axes.Add(axisConfig);
+                _selectionIndex[1] = inputConfig.axes.Count - 1;
+            }
+            //if (_searchString.Length > 0)
+            //{
+            //    UpdateSearchResults();
+            //}
+            Repaint();
+        }
+
+        private void DuplicateInputConfiguration()
+        {
+            InputConfiguration source = _inputManager.GetInputConfiguration(_selectionIndex[0]);
+            InputConfiguration inputConfig = InputConfiguration.Duplicate(source);
+            if (_selectionIndex[0] < _inputManager.GetInputConfigurationCount() - 1)
+            {
+                _inputManager.InsertInputConfiguration(_selectionIndex[0] + 1, inputConfig);
+
+                _selectionIndex[0]++;
+            }
+            else
+            {
+                _inputManager.AddInputConfiguration(inputConfig);
+                _selectionIndex[0] = _inputManager.GetInputConfigurationCount() - 1;
+            }
+            //if (_searchString.Length > 0)
+            //{
+            //    UpdateSearchResults();
+            //}
+            Repaint();
         }
 
         public void CreateNewInputConfiguration()
@@ -481,39 +706,181 @@ namespace Catharsis.InputEditor.View
 
         public void ExportInputConfigurations()
         {
-            
+            string file = EditorUtility.SaveFilePanel("Export input profile", "", "profile.xml", "xml");
+            if (string.IsNullOrEmpty(file))
+                return;
+
+            InputSaverXML inputSaver = new InputSaverXML(file);
+            inputSaver.Save(_inputManager.GetAllInputConfigurations(), _inputManager.GetDefaultConfiguration());
+            if (file.StartsWith(Application.dataPath))
+                AssetDatabase.Refresh();
         }
+
+        private void CopySelectedAxisConfig()
+        {
+            if (_copySource == null)
+                _copySource = new AxisConfiguration();
+
+            InputConfiguration inputConfig = _inputManager.GetInputConfiguration(_selectionIndex[0]);
+            AxisConfiguration axisConfig = inputConfig.axes[_selectionIndex[1]];
+            _copySource.Copy(axisConfig);
+        }
+
+        private void PasteAxisConfig()
+        {
+            InputConfiguration inputConfig = _inputManager.GetInputConfiguration(_selectionIndex[0]);
+            AxisConfiguration axisConfig = inputConfig.axes[_selectionIndex[1]];
+            axisConfig.Copy(_copySource);
+        }
+
 
         public void ImportInputConfigurations()
         {
-            
+            string file = EditorUtility.OpenFilePanel("Import input profile", "", "xml");
+            if (string.IsNullOrEmpty(file))
+                return;
+
+            bool replace = EditorUtility.DisplayDialog("Replace or Append", "Do you want to replace the current input configrations?", "Replace", "Append");
+            if (replace)
+            {
+                string defaultConfig = "";
+                List<InputConfiguration> configs = new List<InputConfiguration>();
+                InputLoaderXML inputLoader = new InputLoaderXML(file);
+                inputLoader.Load(out configs, out defaultConfig);
+                SetCurrentConfigurations(configs,defaultConfig);
+                _selectionIndex.Clear();
+            }
+            else
+            {
+                List<InputConfiguration> configurations;
+                string defaultConfig;
+
+                InputLoaderXML inputLoader = new InputLoaderXML(file);
+                inputLoader.Load(out configurations, out defaultConfig);
+                if (configurations != null && configurations.Count > 0)
+                {
+                    foreach (var config in configurations)
+                    {
+                        _inputManager.AddInputConfiguration(config);
+                    }
+
+                }
+            }
+
+            //if (_searchString.Length > 0)
+            //{
+            //    UpdateSearchResults();
+            //}
         }
 
         private void LoadInputConfigurationsFromResource()
         {
-            //TODO: Work on json serialization
+            //TODO: Currently this does nothing.... Would like it if there was a backup input config just in case everything got deleted.
             if (_inputManager.GetInputConfigurationCount() > 0)
             {
                 bool cont = EditorUtility.DisplayDialog("Warning", "This operation will replace the current input configrations!\nDo you want to continue?", "Yes", "No");
                 if (!cont) return;
             }
 
-            SendLoadPathSignal.Dispatch(INPUT_MANAGER_DEFAULT_CONFIG);
+            //TextAsset textAsset = Resources.Load<TextAsset>(resourcePath);
+            //if (textAsset != null)
+            //{
+            //    using (System.IO.StringReader reader = new System.IO.StringReader(textAsset.text))
+            //    {
+            //        InputLoaderXML inputLoader = new InputLoaderXML(reader);
+            //        inputLoader.Load(out _inputManager.inputConfigurations, out _inputManager.defaultConfiguration);
+            //        _selectionPath.Clear();
+            //    }
+            //}
+            //else
+            //{
+            //    EditorUtility.DisplayDialog("Error", "Failed to load input configurations. The resource file might have been deleted or renamed.", "OK");
+            //}
         }
 
-        public void ReplaceCurrentConfigurations(string defaultConfig, List<InputConfiguration> config)
+        public void SetCurrentConfigurations(List<InputConfiguration> config, string defaultConfig)
         {
             _inputManager.SetDefaultConfiguration(defaultConfig);
             _inputManager.SetInputConfiguration(config);
             _selectionIndex.Clear();
+            Loaded = true;
         }
 
 
-        private void DisplayEditMenu(Rect rect)
+
+
+        private void Delete()
         {
-            EditorGUI.LabelField(rect, "Edit", EditorStyles.toolbarDropDown);
+            if (_selectionIndex.Count == 1)
+            {
+                _inputManager.RemoveInputConfig(_selectionIndex[0]);
+                Repaint();
+            }
+            else if (_selectionIndex.Count == 2)
+            {
+                _inputManager.RemoveAxisConfig(_selectionIndex[0],_selectionIndex[1]);
+                Repaint();
+            }
+            if (_inputManager.GetInputConfigurationCount() == 0)
+            {
+                _inputManager.SetDefaultConfiguration(string.Empty);
+            }
+            _selectionIndex.Clear();
+            //if (_searchString.Length > 0)
+            //{
+            //    UpdateSearchResults();
+            //}
         }
 
+        private void DeleteAll()
+        {
+            _inputManager.RemoveAll();
+            _selectionIndex.Clear();
+            //if (_searchString.Length > 0)
+            //{
+            //    UpdateSearchResults();
+            //}
+            Repaint();
+        }
+
+        private void UpdateHierarchyPanelWidth()
+        {
+            float cursorRectWidth = _isResizingHierarchy ? _maxCursorRectWidth : _minCursorRectWidth;
+            Rect cursorRect = new Rect(_hierarchyPanelWidth - cursorRectWidth / 2, _toolbarHeight, cursorRectWidth,
+                                        position.height - _toolbarHeight);
+            Rect resizeRect = new Rect(_hierarchyPanelWidth - _minCursorRectWidth / 2, 0.0f,
+                                        _minCursorRectWidth, position.height);
+
+            EditorGUIUtility.AddCursorRect(cursorRect, MouseCursor.ResizeHorizontal);
+            switch (Event.current.type)
+            {
+                case EventType.MouseDown:
+                    if (Event.current.button == 0 && resizeRect.Contains(Event.current.mousePosition))
+                    {
+                        _isResizingHierarchy = true;
+                        Event.current.Use();
+                    }
+                    break;
+                case EventType.MouseUp:
+                    if (Event.current.button == 0 && _isResizingHierarchy)
+                    {
+                        _isResizingHierarchy = false;
+                        Event.current.Use();
+                    }
+                    break;
+                case EventType.MouseDrag:
+                    if (_isResizingHierarchy)
+                    {
+                        _hierarchyPanelWidth = Mathf.Clamp(_hierarchyPanelWidth + Event.current.delta.x,
+                                                         _minHierarchyPanelWidth, position.width / 2);
+                        Event.current.Use();
+                        Repaint();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
 
     }
 }

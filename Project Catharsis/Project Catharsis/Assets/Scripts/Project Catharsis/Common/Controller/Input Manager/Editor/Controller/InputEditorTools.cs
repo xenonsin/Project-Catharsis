@@ -10,6 +10,22 @@ namespace Catharsis.InputEditor.Controller
     {
         private static string CUSTOM_PROJECT_SETTINGS = "input_manager_project_settings";
 
+        public static void ShowStartupWarning()
+        {
+            string key = string.Concat(PlayerSettings.productName, ".InputManager.StartupWarning");
+
+            if (!EditorPrefs.GetBool(key, false))
+            {
+                string message = "In order to use InputManager you need to overwrite your project's input settings.\n\nDo you want to overwrite the input settings now?\nYou can always do it from the File menu.";
+                if (EditorUtility.DisplayDialog("Warning", message, "Yes", "No"))
+                {
+                    OverwriteInputSettings();
+                }
+                EditorPrefs.SetBool(key, true);
+            }
+        }
+
+
         public static void OverwriteInputSettings()
 		{
 			TextAsset textAsset = Resources.Load(CUSTOM_PROJECT_SETTINGS) as TextAsset;

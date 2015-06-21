@@ -109,6 +109,22 @@ namespace Catharsis.InputEditor
             return _inputConfigurations[index];
         }
 
+        public void RemoveInputConfig(int inputIndex)
+        {
+            _inputConfigurations.RemoveAt(inputIndex);
+        }
+
+        public void RemoveAll()
+        {
+            _inputConfigurations.Clear();
+            defaultConfiguration = string.Empty;
+        }
+
+        public void RemoveAxisConfig(int inputIndex, int axisIndex)
+        {
+            GetInputConfiguration(inputIndex).axes.RemoveAt(axisIndex);
+        }
+
         public void SetInputConfiguration(List<InputConfiguration> config)
         {
             _inputConfigurations = config;
@@ -118,6 +134,11 @@ namespace Catharsis.InputEditor
         {
             return _currentConfiguration;
 
+        }
+
+        public List<InputConfiguration> GetAllInputConfigurations()
+        {
+            return _inputConfigurations;
         }
 
         public string GetDefaultConfiguration()
@@ -130,7 +151,15 @@ namespace Catharsis.InputEditor
             defaultConfiguration = name;
         }
 
+        public void AddInputConfiguration(InputConfiguration config)
+        {
+            _inputConfigurations.Add(config);
+        }
 
+        public void InsertInputConfiguration(int index, InputConfiguration config)
+        {
+            _inputConfigurations.Insert(index, config);
+        }
 
         #endregion
 
