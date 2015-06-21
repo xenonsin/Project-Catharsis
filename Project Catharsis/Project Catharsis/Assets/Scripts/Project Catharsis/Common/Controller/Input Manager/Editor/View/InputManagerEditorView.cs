@@ -4,7 +4,7 @@
  * options menu.
  * 
  * Work in Progress Features:
- * Right Click (Context) Menus that make it more intuitive to delete, copy, and add new configs directly to the Hiearchy Menu.
+ * Right Click (Context) Menus that make it more intuitive to delete, copy, and add new configs directly to the Hierarchy Menu.
  */
 
 
