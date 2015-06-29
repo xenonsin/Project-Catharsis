@@ -1,4 +1,10 @@
-﻿using UnityEngine;
+﻿/*
+ * The purpose of the Input Manager is to replace the default Unity Default Manager to allow rebinding and creating new Input Configurations during run time.
+ * Originally from: https://github.com/daemon3000/InputManager
+ * Repurposed for this project and adapted to not require a monobehavior and use the StrangeIoC framework.
+ */
+
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -990,6 +996,7 @@ namespace Catharsis.InputEditor
         RaiseConfigurationDirtyEvent(inputConfigName);
     }
 
+        //Todo: probably change this in the future to accommodate new saving pattern similar to the dialogue manager.
     /// <summary>
     /// Saves the input configurations in the XML format, in Application.persistentDataPath.
     /// </summary>

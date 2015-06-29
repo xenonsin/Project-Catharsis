@@ -1,4 +1,17 @@
-﻿using System;
+﻿/*
+ * The purpose of the global variables manager is to keep track of the "global" variables that can exist within a single game. For example,
+ * it can keep track of the quest objectives the player has completed, or the choices a player has made during a dialogue choice.
+ * 
+ * At it's current state, it only saves and loads floats, strings, and booleans. In the future, I could extend this to keep track of map data.
+ * Currently, this module is being used by the Dialogue System.
+ * 
+ * Work in progress features:
+ * Saving to save folder.
+ * Loading.
+ * Loading default.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
