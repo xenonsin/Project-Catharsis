@@ -3,6 +3,8 @@
 
 namespace Catharsis.DialogueEditor.Model
 {
+    //TODO: Add editor extension so that you can add characters
+    //TODO: Allow the Dialogue Editor to choose the animation when using the gameobject
     public class Character
     {
         public string name;

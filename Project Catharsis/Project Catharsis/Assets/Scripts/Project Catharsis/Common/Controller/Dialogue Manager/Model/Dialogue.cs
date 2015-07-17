@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Catharsis.DialogueEditor.Model.Nodes;
 
 namespace Catharsis.DialogueEditor.Model
 {
@@ -17,13 +18,13 @@ namespace Catharsis.DialogueEditor.Model
         /// <summary>
         /// List of all messages the dialogue contains.
         /// </summary>
-        public List<DialogueMessage> messages;
+        public List<DialogueNode> nodes;
 
-        public Dialogue(string name, int ID, List<DialogueMessage> message)
+        public Dialogue(string name, int id, List<DialogueNode> nodes)
         {
             this.name = name;
-            this.id = ID;
-            this.messages = message;
+            this.id = id;
+            this.nodes = nodes;
         }
 
     }

@@ -3,6 +3,8 @@
  * it can keep track of the quest objectives the player has completed, or the choices a player has made during a dialogue choice.
  * 
  * At it's current state, it only saves and loads floats, strings, and booleans. In the future, I could extend this to keep track of map data.
+ * Also, I'd like to have all global variables not defined at the beginning. I'd like to create a method where when something would like to check
+ * if the variable exists.. if it doesn't then it would just return false. So that dynamic quests could be created.
  * Currently, this module is being used by the Dialogue System.
  * 
  * Work in progress features:
@@ -29,6 +31,7 @@ namespace Catharsis.GlobalVariablesManager
         private GlobalVariables _data;
 
         //Todo: make command that calls this at gamestart, when the savefile is picked?
+        //TODO: make it so that you'll be able to add values during runtime.
         #region Serialization
         //Load default variables???
         //Make this a command????
