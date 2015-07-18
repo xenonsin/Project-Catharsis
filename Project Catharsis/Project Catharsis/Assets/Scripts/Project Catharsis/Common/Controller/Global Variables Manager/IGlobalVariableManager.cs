@@ -1,6 +1,6 @@
 ﻿namespace Catharsis.GlobalVariablesManager
 {
-    public class IGlobalVariableManager
+    public interface IGlobalVariableManager
     {
          
     }

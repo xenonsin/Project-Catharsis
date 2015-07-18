@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Catharsis.DialogueEditor.Model.Nodes
 {
-    public class DialogueNode
+    public abstract class DialogueNode
     {
          
     }

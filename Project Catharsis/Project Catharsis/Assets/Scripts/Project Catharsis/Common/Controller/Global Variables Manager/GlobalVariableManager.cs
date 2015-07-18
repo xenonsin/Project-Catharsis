@@ -29,10 +29,7 @@ namespace Catharsis.GlobalVariablesManager
         private GlobalVariables _data;
 
         //Todo: make command that calls this at gamestart, when the savefile is picked?
-        //TODO: make it so that you'll be able to add values during runtime.
         #region Serialization
-        //Load default variables???
-        //Make this a command????
         public void loadGlobalVariables(string globalVariablesXml)
         {
             XmlSerializer deserializer = new XmlSerializer(typeof(GlobalVariables));
