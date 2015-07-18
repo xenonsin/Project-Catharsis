@@ -22,21 +22,33 @@ namespace Catharsis.DialogueEditor
 
         #endregion
 
+        //probably put this in the mediator?
         private DialogueEditorData _dialogueData;
 
         [SerializeField]
         private Vector2 _hierarchyScrollPos = Vector2.zero;
         [SerializeField]
         private float _hierarchyPanelWidth = _menuWidth * 2;
+
+        //[0] - Current Dialogue
+        //[1] - Current Node
         [SerializeField] 
-        private List<int> _selectionIndex; 
+        private int currentDialogue;
+        [SerializeField]
+        private int currentNode;
+        [SerializeField]
+        private Texture2D _highlightTexture;
+
+        private bool loaded = false;
 
         //Window Dimensions
         private float _toolbarHeight = 18.0f;
+        private float _hierarchyItemHeight = 20.0f;
         private const float _minWindowRectWidth = 800.0f;
         private const float _minWindowRectHeight = 400.0f;
         private const float _menuWidth = 100.0f;
         private const float _minHierarchyPanelWidth = 150.0f;
+
          
         [MenuItem("Catharsis/Dialogue Manager/Dialogue Editor", false, 0)]
         public static void OpenWindow()
@@ -51,23 +63,49 @@ namespace Catharsis.DialogueEditor
         {
             base.OnEnable();
 
-            if (_selectionIndex == null)
-                _selectionIndex = new List<int>();
+            if (currentDialogue == null)
+                currentDialogue = 0;
+            if (currentNode == null)
+                currentNode = 0;
 
             if (_dialogueData == null)
                 _dialogueData = new DialogueEditorData();
+
+            //Debug
+            if (_dialogueData.DialogueCount < 5)
+                for (int i = 0; i < 5 ; i ++)
+                    _dialogueData.AddDialogue(1);
+            
+            if (_highlightTexture == null)
+                CreateHighlightTexture();
+
+            loaded = true;
         }
 
         void OnDisable()
         {
             base.OnDisable();
+            Texture2D.DestroyImmediate(_highlightTexture);
+            _highlightTexture = null;
         }
 
         void OnGUI()
         {
-            DisplayNodePanel();
-            DisplayHierarchyPanel();
+            if (loaded)
+            {
+                DisplayNodePanel();
+                DisplayHierarchyPanel();
+                
+            }
+
             DisplayToolBar();
+        }
+
+        private void CreateHighlightTexture()
+        {
+            _highlightTexture = new Texture2D(1, 1);
+            _highlightTexture.SetPixel(0, 0, new Color32(50, 125, 255, 255));
+            _highlightTexture.Apply();
         }
 
         void DisplayNodePanel()
@@ -75,6 +113,7 @@ namespace Catharsis.DialogueEditor
             
         }
 
+        #region HierarchyPanel
         void DisplayHierarchyPanel()
         {
             Rect screenRect = new Rect(0.0f, _toolbarHeight - 5.0f, _hierarchyPanelWidth, position.height - _toolbarHeight + 10.0f);
@@ -82,25 +121,68 @@ namespace Catharsis.DialogueEditor
 
             GUI.Box(screenRect, "");
             GUILayout.BeginArea(scrollView);
+
+
             _hierarchyScrollPos = EditorGUILayout.BeginScrollView(_hierarchyScrollPos);
             GUILayout.Space(5.0f);
+            for (int i = 0; i < _dialogueData.DialogueCount; i++)
+            {
+                DisplayHierarchyDialogueItem(screenRect, i, _dialogueData.dialogues[i].name);
 
-            //for (int i = 0; i < _inputManager.GetInputConfigurationCount(); i++)
-            //{
-            //    DisplayHierarchyInputConfigItem(screenRect, i, _inputManager.GetInputConfiguration(i).name);
-            //    if (_inputManager.GetInputConfiguration(i).isExpanded)
-            //    {
-            //        for (int j = 0; j < _inputManager.GetInputConfiguration(i).axes.Count; j++)
-            //        {
-            //            DisplayHierarchiAxisConfigItem(screenRect, i, j, _inputManager.GetInputConfiguration(i).axes[j].name);
-            //        }
-            //    }
-            //}
-
+            }
+            
             GUILayout.Space(5.0f);
             EditorGUILayout.EndScrollView();
             GUILayout.EndArea();
         }
+
+        void DisplayHierarchyDialogueItem(Rect rect, int index, string name)
+        {
+            Vector2 mouseClickPosition = Vector2.zero;
+            if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && rect.Contains(Event.current.mousePosition))
+            {
+                mouseClickPosition = new Vector2(Event.current.mousePosition.x - rect.x - 3, Event.current.mousePosition.y - rect.y - 3 + _hierarchyItemHeight);
+            }
+
+            Rect configPos = GUILayoutUtility.GetRect(new GUIContent(name), EditorStyles.label, GUILayout.Height(_hierarchyItemHeight));
+
+            if (mouseClickPosition != Vector2.zero && configPos.Contains(mouseClickPosition))
+            {
+                currentDialogue = index;
+            }
+
+            //Display Highlight texture
+            //if (configPos.Contains(Event.current.mousePosition))
+            //{
+            //    GUI.color = Color.grey;
+            //    GUI.Box(configPos, string.Empty);
+            //}
+
+            //GUI.color = GUI.contentColor;
+
+            //Debug.Log(_selectionIndex.Count);
+
+            if (currentDialogue == index) //_selectionIndex[0] == index
+            {
+                if (_highlightTexture == null)
+                {
+                    CreateHighlightTexture();
+                }
+                GUI.DrawTexture(configPos, _highlightTexture, ScaleMode.StretchToFill);
+
+            }
+            
+
+            Rect labelNumberRow = new Rect(configPos.x + 2, configPos.y + 2, configPos.width - 4, configPos.height - 4);
+            Rect labelNameRow = new Rect(labelNumberRow.x + 25, labelNumberRow.y, labelNumberRow.width - 25, labelNumberRow.height);
+
+            GUI.Label(labelNumberRow, _dialogueData.dialogues[index].id.ToString());
+            GUI.Label(labelNameRow, (_dialogueData.dialogues[index].name == string.Empty) ? "-" : _dialogueData.dialogues[index].name);
+
+            Repaint();
+           
+        }
+        #endregion
 
         #region Toolbar
         void DisplayToolBar()
@@ -145,7 +227,7 @@ namespace Catharsis.DialogueEditor
             fileMenu.AddItem(new GUIContent("New Dialogue"), false, HandleFileMenuOption, FileMenuOptions.NewDialogue);
             fileMenu.AddSeparator("");
 
-            if (_selectionIndex.Count >= 1)
+            if (currentNode >= 1)
             {
                 fileMenu.AddItem(new GUIContent("Add Message Node"), false, HandleFileMenuOption,FileMenuOptions.AddMessageNode);
                 fileMenu.AddItem(new GUIContent("Add Branching Message Node"), false, HandleFileMenuOption,FileMenuOptions.AddBranchingMessageNode);
@@ -234,12 +316,12 @@ namespace Catharsis.DialogueEditor
         private void CreateEditMenu(Rect rect)
         {
             GenericMenu editMenu = new GenericMenu();
-            if (_selectionIndex.Count > 0)
+            if (currentNode >= 1)
                 editMenu.AddItem(new GUIContent("Duplicate          Shift+D"), false, HandleEditMenuOption, EditMenuOptions.Duplicate);
             else
                 editMenu.AddDisabledItem(new GUIContent("Duplicate          Shift+D"));
 
-            if (_selectionIndex.Count > 0)
+            if (currentNode >= 1)
                 editMenu.AddItem(new GUIContent("Delete                Del"), false, HandleEditMenuOption, EditMenuOptions.Delete);
             else
                 editMenu.AddDisabledItem(new GUIContent("Delete                Del"));
@@ -249,7 +331,7 @@ namespace Catharsis.DialogueEditor
             //else
             //    editMenu.AddDisabledItem(new GUIContent("Delete All"));
 
-            if (_selectionIndex.Count >= 2)
+            if (currentNode >= 1)
                 editMenu.AddItem(new GUIContent("Copy"), false, HandleEditMenuOption, EditMenuOptions.Copy);
             else
                 editMenu.AddDisabledItem(new GUIContent("Copy"));

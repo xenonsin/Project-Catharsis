@@ -11,7 +11,7 @@ namespace Catharsis.DialogueEditor.Model
 
         public List<DialogueEditorDialogueObject> dialogues;
 
-        public int count { get { return dialogues.Count; } }
+        public int DialogueCount { get { return dialogues.Count; } }
 
         private int _currentDialogueId;
 
@@ -20,7 +20,7 @@ namespace Catharsis.DialogueEditor.Model
             get { return _currentDialogueId; }
             set
             {
-                _currentDialogueId = Mathf.Clamp(value, 0, count - 1);
+                _currentDialogueId = Mathf.Clamp(value, 0, DialogueCount - 1);
             }
         }
         public DialogueEditorData()
@@ -39,6 +39,8 @@ namespace Catharsis.DialogueEditor.Model
             
         }
 
+        //Adds Dialogue at the end of the list.
+        //Allow to reorder?
         public void AddDialogue(int newDialogueCount)
         {
             for (int i = 0; i < newDialogueCount; i += 1)
@@ -51,17 +53,13 @@ namespace Catharsis.DialogueEditor.Model
             }
         }
 
-        public void RemoveDialogue(int removeCount)
+        //TODO: Find a way to get the correct selection index
+        public void RemoveDialogue(int index)
         {
-            if (count < 1) return;
 
-            for (int i = 0; i < removeCount; i += 1)
-            {
-                int num = dialogues.Count - 1;
-                //Debug.Log ("Removing Entry: "+num);
-                dialogues.RemoveAt(num);
-            }
-
+            dialogues.RemoveAt(index);
+            
+            //?
             CurrentDialogueId = CurrentDialogueId;
         }
     }

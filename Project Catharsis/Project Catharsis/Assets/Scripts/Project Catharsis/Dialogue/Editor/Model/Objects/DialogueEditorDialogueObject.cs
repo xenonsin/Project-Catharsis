@@ -4,5 +4,11 @@
     public class DialogueEditorDialogueObject
     {
         public int id;
+        public string name;
+
+        public DialogueEditorDialogueObject()
+        {
+            name = "sup";
+        }
     }
 }
