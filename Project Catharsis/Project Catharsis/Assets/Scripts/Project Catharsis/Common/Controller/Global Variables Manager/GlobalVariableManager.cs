@@ -3,8 +3,6 @@
  * it can keep track of the quest objectives the player has completed, or the choices a player has made during a dialogue choice.
  * 
  * At it's current state, it only saves and loads floats, strings, and booleans. In the future, I could extend this to keep track of map data.
- * Also, I'd like to have all global variables not defined at the beginning. I'd like to create a method where when something would like to check
- * if the variable exists.. if it doesn't then it would just return false. So that dynamic quests could be created.
  * Currently, this module is being used by the Dialogue System.
  * 
  * Work in progress features:
@@ -42,22 +40,22 @@ namespace Catharsis.GlobalVariablesManager
             GlobalVariables newGlobalVariables = (GlobalVariables) deserializer.Deserialize(xmlReader);
 
             //Bools
-            for (int i = 0; i < newGlobalVariables.booleans.Count; i++)
-            {
-                _data.booleans[i] = newGlobalVariables.booleans[i];
-            }
+            //for (int i = 0; i < newGlobalVariables.booleans.Count; i++)
+            //{
+            //    _data.booleans[i] = newGlobalVariables.booleans[i];
+            //}
 
-            //Floats
-            for (int i = 0; i < newGlobalVariables.floats.Count; i++)
-            {
-                _data.floats[i] = newGlobalVariables.floats[i];
-            }
+            ////Floats
+            //for (int i = 0; i < newGlobalVariables.floats.Count; i++)
+            //{
+            //    _data.floats[i] = newGlobalVariables.floats[i];
+            //}
 
-            //String
-            for (int i = 0; i < newGlobalVariables.strings.Count; i++)
-            {
-                _data.strings[i] = newGlobalVariables.strings[i];
-            }
+            ////String
+            //for (int i = 0; i < newGlobalVariables.strings.Count; i++)
+            //{
+            //    _data.strings[i] = newGlobalVariables.strings[i];
+            //}
         }
 
         //Todo: when person saves game?
@@ -69,34 +67,55 @@ namespace Catharsis.GlobalVariablesManager
 
         #region Getters and Setters
 
-        public float GetGlobalFloat(int id)
+        public float GetGlobalFloat(string id)
         {
-            return _data.floats[id];
+            float value;
+            if (_data.floats.TryGetValue("id", out value))
+                return value;
+
+            return 0f; 
         }
 
-        public void SetGlobalFloat(int id, float value)
+        public void SetGlobalFloat(string id, float value)
         {
-            _data.floats[id] = value;
+            if (_data.floats.ContainsKey(id))
+                _data.floats[id] = value;
+            else
+                _data.floats.Add("id", value);
         }
 
-        public bool GetGlobalBool(int id)
+        public bool GetGlobalBool(string id)
         {
-            return _data.booleans[id];
+            bool value;
+            if (_data.booleans.TryGetValue("id", out value))
+                return value;
+            
+            return false;
         }
 
-        public void SetGlobalBool(int id, bool value)
+        public void SetGlobalBool(string id, bool value)
         {
-            _data.booleans[id] = value;
+            if (_data.booleans.ContainsKey(id))
+                _data.booleans[id] = value;
+            else
+                _data.booleans.Add("id", value);
         }
 
-        public string GetGlobalString(int id)
+        public string GetGlobalString(string id)
         {
-            return _data.strings[id];
+            string value;
+            if (_data.strings.TryGetValue("id", out value))
+                return value;
+
+            return default(string);
         }
 
-        public void SetGlobalString(int id, string value)
+        public void SetGlobalString(string id, string value)
         {
-            _data.strings[id] = value;
+            if (_data.strings.ContainsKey(id))
+                _data.strings[id] = value;
+            else
+                _data.strings.Add("id", value);
         }
 
         #endregion

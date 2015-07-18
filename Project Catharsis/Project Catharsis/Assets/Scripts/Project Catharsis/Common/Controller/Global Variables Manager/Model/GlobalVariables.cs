@@ -6,11 +6,11 @@ namespace Catharsis.GlobalVariablesManager.Model
     [Serializable]
     public class GlobalVariables
     {
-        public List<bool> booleans;
-        public List<float> floats;
-        public List<string> strings;
+        public Dictionary<string, bool> booleans;
+        public Dictionary<string, float> floats;
+        public Dictionary<string, string> strings;
 
-        public GlobalVariables(List<bool> booleans, List<float> floats, List<string> strings)
+        public GlobalVariables(Dictionary<string, bool> booleans, Dictionary<string, float> floats, Dictionary<string, string> strings)
         {
             this.booleans = booleans;
             this.floats = floats;
