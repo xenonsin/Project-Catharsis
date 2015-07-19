@@ -40,7 +40,7 @@ namespace Catharsis.InputEditor.View
         //Would be great if these were commands.......
         private void OnLoadInputSignal()
         {
-
+            //can move this to inside the input manager folder
             TextAsset textAsset = Resources.Load("InputManager/default_input") as TextAsset;
             if (textAsset != null)
             {
