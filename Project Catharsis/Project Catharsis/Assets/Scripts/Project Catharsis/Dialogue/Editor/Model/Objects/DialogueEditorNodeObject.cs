@@ -54,6 +54,8 @@ namespace Catharsis.DialogueEditor.Model.Objects
 			text = string.Empty;
 			
 			outs = new List<int?>();
+            
+
 			choices = new List<string>();
 			
 			waitType = DialogueEditorWaitTypes.Seconds;

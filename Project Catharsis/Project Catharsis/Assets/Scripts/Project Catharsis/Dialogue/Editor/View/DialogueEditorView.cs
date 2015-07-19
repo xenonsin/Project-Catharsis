@@ -93,14 +93,18 @@ namespace Catharsis.DialogueEditor
                 currentNode = 0;
 
             if (_dialogueData == null)
+            {
                 _dialogueData = new DialogueEditorData();
+                //Debug
+                //if (_dialogueData.DialogueCount < 5)
+                    //for (int i = 0; i < 5; i++)
+                      // _dialogueData.AddDialogue(1);
+
+            }
 
             InitNodeTypes();
 
-            //Debug
-            if (_dialogueData.DialogueCount < 5)
-                for (int i = 0; i < 5 ; i ++)
-                    _dialogueData.AddDialogue(1);
+            
             
             if (_highlightTexture == null)
                 CreateHighlightTexture();
@@ -356,7 +360,7 @@ namespace Catharsis.DialogueEditor
             GUI.Box(startRect, string.Empty);
             Rect startLabelRect = new Rect(startRect.x + 4, startRect.y + 3, startRect.width, 20);
             GUI.Label(startLabelRect, "Start Page");
-            string startConnectorType = (_dialogueData.dialogues[currentDialogue].startPage != null) ? "connector_full" : "connector_empty";
+            //string startConnectorType = (_dialogueData.dialogues[currentDialogue].startPage != null) ? "connector_full" : "connector_empty";
             Rect startOutputButtonRect = new Rect(startRect.x + startRect.width - 19, startRect.y + 3, 16, 16);
             if (Event.current.type == EventType.MouseDown && startOutputButtonRect.Contains(Event.current.mousePosition))
             {
@@ -435,29 +439,57 @@ namespace Catharsis.DialogueEditor
         void DisplayHierarchyPanel()
         {
             Rect screenRect = new Rect(0.0f, _toolbarHeight - 5.0f, _hierarchyPanelWidth, position.height - _toolbarHeight + 10.0f);
-            Rect scrollView = new Rect(screenRect.x, screenRect.y, screenRect.width, position.height - screenRect.y);
+            Rect scrollView = new Rect(screenRect.x, screenRect.y + 20, screenRect.width, position.height - screenRect.y);
 
-            GUI.Box(screenRect, "");
+            //ADD
+            Rect addButtonRect = new Rect(screenRect.x + 5, screenRect.y + 15, (screenRect.width * 0.5f) - 5, 30);
+            if (GUI.Button(addButtonRect, "Add", EditorStyles.miniButtonLeft))
+                AddDialogue(1);
+
+            // REMOVE
+            Rect deleteButtonRect = new Rect((screenRect.width * 0.5f), screenRect.y + 15, (screenRect.width * 0.5f) - 5, 30);
+            if (_dialogueData.DialogueCount > 0)
+            {
+                if (GUI.Button(deleteButtonRect, "Delete", EditorStyles.miniButtonRight))
+                    RemoveDialogue(currentDialogue);
+
+            }
+            else
+            {
+                GUI.color = new Color(1, 1, 1, 0.25f);
+                GUI.Button(deleteButtonRect, "Delete");
+                GUI.color = GUI.contentColor;
+            }
+
+
             GUILayout.BeginArea(scrollView);
-
+            //GUI.Box(screenRect, "");
+            GUI.Box(scrollView, "");
+            GUILayout.Space(33.0f);
 
             _hierarchyScrollPos = EditorGUILayout.BeginScrollView(_hierarchyScrollPos);
-            GUILayout.Space(5.0f);
+
+            
             for (int i = 0; i < _dialogueData.DialogueCount; i++)
             {
+
+
                 DisplayHierarchyDialogueItem(screenRect, i, _dialogueData.dialogues[i].name);
 
             }
             
-            GUILayout.Space(5.0f);
+            
             EditorGUILayout.EndScrollView();
+            GUILayout.Space(20.0f);
             GUILayout.EndArea();
         }
 
         void DisplayHierarchyDialogueItem(Rect rect, int index, string name)
         {
+            
+
             Vector2 mouseClickPosition = Vector2.zero;
-            if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && rect.Contains(Event.current.mousePosition))
+            if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
                 mouseClickPosition = new Vector2(Event.current.mousePosition.x - rect.x - 3, Event.current.mousePosition.y - rect.y - 3 + _hierarchyItemHeight);
             }
@@ -468,7 +500,7 @@ namespace Catharsis.DialogueEditor
             {
                 currentDialogue = index;
             }
-
+             //GUI.Box(configPos, string.Empty);
             //Display Highlight texture
             //if (configPos.Contains(Event.current.mousePosition))
             //{
@@ -488,7 +520,7 @@ namespace Catharsis.DialogueEditor
                 GUI.DrawTexture(configPos, _highlightTexture, ScaleMode.StretchToFill);
 
             }
-            
+            //GUI.Box(configPos,string.Empty);
 
             Rect labelNumberRow = new Rect(configPos.x + 2, configPos.y + 2, configPos.width - 4, configPos.height - 4);
             Rect labelNameRow = new Rect(labelNumberRow.x + 25, labelNumberRow.y, labelNumberRow.width - 25, labelNumberRow.height);
@@ -583,7 +615,7 @@ namespace Catharsis.DialogueEditor
 
                     break;
                 case FileMenuOptions.NewDialogue:
-
+                    AddDialogue(1);
                     break;
                 case FileMenuOptions.AddMessageNode:
  
@@ -638,7 +670,7 @@ namespace Catharsis.DialogueEditor
             else
                 editMenu.AddDisabledItem(new GUIContent("Duplicate          Shift+D"));
 
-            if (currentNode >= 1)
+            if (_dialogueData.DialogueCount > 0)
                 editMenu.AddItem(new GUIContent("Delete                Del"), false, HandleEditMenuOption, EditMenuOptions.Delete);
             else
                 editMenu.AddDisabledItem(new GUIContent("Delete                Del"));
@@ -672,7 +704,7 @@ namespace Catharsis.DialogueEditor
                    // Duplicate();
                     break;
                 case EditMenuOptions.Delete:
-                   // Delete();
+                    RemoveDialogue(currentDialogue);
                     break;
                 case EditMenuOptions.DeleteAll:
                    // DeleteAll();
@@ -729,8 +761,10 @@ namespace Catharsis.DialogueEditor
             //string outputButtonType = (node.outs[outputIndex] != null) ? "connector_full" : "connector_empty";
             if (Event.current.type == EventType.MouseDown && outputButtonRect.Contains(Event.current.mousePosition))
             {
+               
                 if (Event.current.button == 0)
                 {
+                    Debug.Log(outputIndex);
                     node.outs[outputIndex] = null;
                     _outputSelection = new DialogueEditorSelectionObject(node.id, outputIndex);
                 }
@@ -745,7 +779,7 @@ namespace Catharsis.DialogueEditor
 
 
             }
-            GUI.Button(outputButtonRect, string.Empty);
+            GUI.Button(outputButtonRect, string.Empty, new GUIStyle(GUI.skin.GetStyle("IN Foldout")));
         }
         private Vector2 GetNodeOutputPosition(int id, int outputIndex)
         {
@@ -958,7 +992,7 @@ namespace Catharsis.DialogueEditor
             // Input
             Rect inputButtonRect = new Rect(titleBarRect.x + 2, titleBarRect.y + 2, 16, 16);
             //if(Event.current.type == EventType.MouseUp && inputButtonRect.Contains(mousePosition)){
-            if (GUI.Button(inputButtonRect, string.Empty))
+            if (GUI.Button(inputButtonRect, string.Empty, new GUIStyle(GUI.skin.GetStyle("OL Toggle"))))
             {
                 HandleNodeInputClicked(node.id);
                 Event.current.Use();
@@ -966,8 +1000,8 @@ namespace Catharsis.DialogueEditor
             //GUI.Button(inputButtonRect, string.Empty, DialogueEditorGUI.gui.GetStyle("connector_input"));
 
             // Close
-            Rect closeButtonRect = new Rect(titleBarRect.x + titleBarRect.width - 16 - 2, titleBarRect.y + 2, 16, 16);
-            if (GUI.Button(closeButtonRect, string.Empty))
+            Rect closeButtonRect = new Rect(titleBarRect.x + titleBarRect.width - 24, titleBarRect.y + 2, 20, 16);
+            if (GUI.Button(closeButtonRect, "X"))
             {
                 HandleNodeRemoveClick(node.id);
                 Event.current.Use();
@@ -1214,6 +1248,19 @@ namespace Catharsis.DialogueEditor
             DrawOutputConnector(node, new Vector2(outputButtonRect.x, outputButtonRect.y), 0);
 
             DrawTextNodeAdvanced(node, 130, (int)baseRect.width);
+        }
+        #endregion
+
+        #region Button Functions
+
+        private void AddDialogue(int numberOfDialoguesToCreate)
+        {
+            _dialogueData.AddDialogue(numberOfDialoguesToCreate, out currentDialogue);
+        }
+
+        private void RemoveDialogue(int indexOfDialogue)
+        {
+            _dialogueData.RemoveDialogue(indexOfDialogue);
         }
         #endregion
     }

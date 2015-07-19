@@ -40,16 +40,17 @@ namespace Catharsis.DialogueEditor.Model
         }
 
         //Adds Dialogue at the end of the list.
-        //Allow to reorder?
-        public void AddDialogue(int newDialogueCount)
+        //BUG: Currently this just gets the count then continues from there.. even if the id already exists.
+        public void AddDialogue(int newDialogueCount, out int newCurrentID)
         {
+            newCurrentID = 0;
             for (int i = 0; i < newDialogueCount; i += 1)
             {
                 int num = dialogues.Count;
                 //Debug.Log ("Adding Entry: "+num);
                 dialogues.Add(new DialogueEditorDialogueObject());
                 dialogues[num].id = num;
-                CurrentDialogueId = dialogues[num].id;
+                newCurrentID = dialogues[num].id;
             }
         }
 
