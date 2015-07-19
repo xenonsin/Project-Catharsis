@@ -123,10 +123,7 @@ namespace Catharsis.InputEditor.View
                 LoadInputConfiguration();
             }
 
-
         }
-
-
 
         private void OnDisable()
         {

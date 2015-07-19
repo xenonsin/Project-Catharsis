@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace Catharsis.DialogueEditor.Model
 {
-    [System.Serializable]
     public class DialogueEditorData
     {
 
@@ -55,13 +54,11 @@ namespace Catharsis.DialogueEditor.Model
         }
 
         //TODO: Find a way to get the correct selection index
-        public void RemoveDialogue(int index)
+        public void RemoveDialogue(int index, out int newCurrentID)
         {
-
+            newCurrentID = (index - 1) < 0 ? 0: (index-1);
             dialogues.RemoveAt(index);
-            
-            //?
-            CurrentDialogueId = CurrentDialogueId;
+
         }
     }
 }

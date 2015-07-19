@@ -66,9 +66,9 @@ namespace Catharsis.DialogueEditor.Model.Objects
             outs.Add(null);
         }
 
-        public void RemoveOut(int index)
+        public void RemoveOut()
         {
-            outs.RemoveAt(index);
+            outs.RemoveAt(outs.Count - 1);
         }
 
         public void AddNewChoice()
@@ -77,10 +77,10 @@ namespace Catharsis.DialogueEditor.Model.Objects
             choices.Add(string.Empty);
         }
 
-        public void RemoveChoice(int index)
+        public void RemoveChoice()
         {
-            RemoveOut(index);
-            choices.RemoveAt(index);
+            RemoveOut();
+            choices.RemoveAt(choices.Count - 1);
         }
     }
 
@@ -193,7 +193,6 @@ namespace Catharsis.DialogueEditor.Model.Objects
 
             node.outs = new List<int?>();
             node.outs.Add(null);
-            
             return node;
         }
 

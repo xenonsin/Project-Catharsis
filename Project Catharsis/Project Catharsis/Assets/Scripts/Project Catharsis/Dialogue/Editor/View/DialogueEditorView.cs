@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Catharsis.DialogueEditor.Model;
 using Catharsis.DialogueEditor.Model.Objects;
+using Catharsis.DialogueEditor.Model.VariableEditor;
 using strange.extensions.editor.impl;
 using UnityEditor;
 using UnityEngine;
@@ -28,7 +29,10 @@ namespace Catharsis.DialogueEditor
 
 
         //probably put this in the mediator?
+        [SerializeField]
         private DialogueEditorData _dialogueData;
+        [SerializeField]
+        private string lastScenario;
 
         [SerializeField]
         private Vector2 _hierarchyScrollPos = Vector2.zero;
@@ -46,6 +50,7 @@ namespace Catharsis.DialogueEditor
 
         private bool loaded = false;
 
+        [SerializeField]
         private Dictionary<int, DialogueEditorNodeType> _nodeTypes;
 
         // Dragging vars
@@ -80,32 +85,37 @@ namespace Catharsis.DialogueEditor
             DialogueEditorView window = EditorWindow.GetWindow<DialogueEditorView>("Dialogue Editor");
             window.minSize = new Vector2(_minWindowRectWidth, _minWindowRectHeight);
             //window.title
-            window.Show();
+            
+            //window.Show();
+            window.Init();
         }
 
         void OnEnable()
         {
             base.OnEnable();
+            InitNodeTypes();
+            if (_dialogueData == null)
+            {
+                Debug.Log("Loading last scenario: " + lastScenario);
+                _dialogueData = new DialogueEditorData();
+                Load(lastScenario);
+            }
+            //Init();
+        }
 
+        private void Init()
+        {
             if (currentDialogue == null)
                 currentDialogue = 0;
             if (currentNode == null)
                 currentNode = 0;
-
-            if (_dialogueData == null)
-            {
-                _dialogueData = new DialogueEditorData();
-                //Debug
-                //if (_dialogueData.DialogueCount < 5)
-                    //for (int i = 0; i < 5; i++)
-                      // _dialogueData.AddDialogue(1);
-
-            }
-
-            InitNodeTypes();
-
             
-            
+            _outputSelection = null;
+
+            if (_nodeTypes == null)
+                InitNodeTypes();
+            GetNodeScrollLimits();
+
             if (_highlightTexture == null)
                 CreateHighlightTexture();
 
@@ -131,12 +141,37 @@ namespace Catharsis.DialogueEditor
         {
             if (loaded)
             {
+                SetToolInfo(string.Empty, string.Empty);
+                SetTooltip(string.Empty);
+
                 DisplayNodePanel();
                 DisplayHierarchyPanel();
-                
-            }
 
+
+
+
+               
+            }
             DisplayToolBar();
+        }
+
+        private void Load(string nameOfScenario)
+        {
+            //This one will automatically load from the lastScenario
+        }
+
+        private void Load()
+        {
+            //This one will prompt the user with a window..
+        }
+        private void Save()
+        {
+            
+        }
+
+        private void SetConfigurations()
+        {
+            
         }
 
         private void LoadBgTexture()
@@ -217,6 +252,8 @@ namespace Catharsis.DialogueEditor
                     newNodePosition.x = _dialogueData.dialogues[currentDialogue].scrollPosition.x + 20;
                     newNodePosition.y = _dialogueData.dialogues[currentDialogue].scrollPosition.y + 20;
                     _dialogueData.dialogues[currentDialogue].AddNode(_nodeTypes[i].type, newNodePosition);
+                    //Debug.Log(_dialogueData.dialogues[currentDialogue].nodes[0].outs[0]);
+
                 }
 
                 if (buttonRects[i].Contains(Event.current.mousePosition))
@@ -243,6 +280,10 @@ namespace Catharsis.DialogueEditor
             GUIStyle tooltipInfoStyle = new GUIStyle(EditorStyles.miniLabel);
             tooltipInfoStyle.alignment = TextAnchor.UpperLeft;
             GUI.Label(new Rect(toolInfoBg.x + 2, toolInfoBg.y + 15, toolInfoBg.width - 4, toolInfoBg.height - 15), _toolInfoDescription, tooltipInfoStyle);
+
+            //Save Warning
+            GUI.Label(new Rect(toolInfoBg.x + 400, toolInfoBg.y + 5, toolInfoBg.width - 4, toolInfoBg.height - 15), "Remember to SAVE!");
+
         }
 
         void DisplayCanvas(Rect rect)
@@ -275,6 +316,7 @@ namespace Catharsis.DialogueEditor
 
                 _dialogueData.dialogues[currentDialogue].scrollPosition = GUI.BeginScrollView(scrollRect, GetScrollPosition(), new Rect(0, 0, newScrollSize.x, newScrollSize.y), true, true);
             }
+
 
             //Draw Connections
             DrawConnections();
@@ -398,32 +440,31 @@ namespace Catharsis.DialogueEditor
                 for (int i = 0; i < _dialogueData.dialogues[currentDialogue].nodes.Count; i += 1)
                 {
                     DialogueEditorNodeObject node = _dialogueData.dialogues[currentDialogue].nodes[i];
-
+                    //Debug.Log(_dialogueData.dialogues[currentDialogue].nodes[i].outs[0]); fail
                     switch (node.type)
                     {
-
                         case DialogueEditorNodeTypes.MessageNode:
-                            DrawMessage(node);
+                            DrawMessage(node);                         
                             break;
 
                         case DialogueEditorNodeTypes.BranchingMessageNode:
-                            //drawBranchedTextPhase(phase);
+                            DrawBranchedMessageNode(node);
                             break;
 
                         case DialogueEditorNodeTypes.SetVariableNode:
-                            //drawSetVariablePhase(phase);
+                            DrawSetVariableNode(node);
                             break;
 
                         case DialogueEditorNodeTypes.ConditionalNode:
-                            //drawConditionalPhase(phase);
+                            DrawConditionalNode(node);
                             break;
 
                         case DialogueEditorNodeTypes.GenericEventNode:
-                            //drawSendMessagePhase(phase);
+                            DrawEventNode(node);
                             break;
 
                         case DialogueEditorNodeTypes.EndNode:
-                            //drawEndPhase(phase);
+                            DrawEndNode(node);
                             break;
 
                         case DialogueEditorNodeTypes.EmptyNode:
@@ -723,11 +764,6 @@ namespace Catharsis.DialogueEditor
             if (GUI.Button(rect, "Save", EditorStyles.toolbarButton))
                 Save();
         }
-
-        private void Save()
-        {
-            
-        }
         #endregion
 
 
@@ -764,7 +800,7 @@ namespace Catharsis.DialogueEditor
                
                 if (Event.current.button == 0)
                 {
-                    Debug.Log(outputIndex);
+                    //Debug.Log(node.outs[].ToString());
                     node.outs[outputIndex] = null;
                     _outputSelection = new DialogueEditorSelectionObject(node.id, outputIndex);
                 }
@@ -997,6 +1033,7 @@ namespace Catharsis.DialogueEditor
                 HandleNodeInputClicked(node.id);
                 Event.current.Use();
             }
+                
             //GUI.Button(inputButtonRect, string.Empty, DialogueEditorGUI.gui.GetStyle("connector_input"));
 
             // Close
@@ -1017,6 +1054,162 @@ namespace Catharsis.DialogueEditor
             }
 
             return new Rect(box.x, box.y, width, 25);
+        }
+
+        // VARIABLE BASE
+        private Rect DrawVariableNodeBase(DialogueEditorNodeObject node, int height)
+        {
+            int width = 300;
+            Rect baseRect = DrawNodeBase(node, width, height);
+
+            DialogueEditorVariablesContainer variables;
+
+            if (node.variableType == VariableEditorTypes.Float)
+            {
+                variables = _dialogueData.dialogues[currentDialogue].floats;
+            }
+            else if (node.variableType == VariableEditorTypes.String)
+            {
+                variables = _dialogueData.dialogues[currentDialogue].strings;
+            }
+            else
+            {
+                variables = _dialogueData.dialogues[currentDialogue].booleans;
+            }
+
+            //if (node.variableScope == VariableEditorScopes.Global)
+            //{
+            //    if (node.variableType == VariableEditorTypes.Float)
+            //    {
+            //        variables = _dialogueData.floats;
+            //    }
+            //    else if (node.variableType == VariableEditorTypes.String)
+            //    {
+            //        variables = _dialogueData.strings;
+            //    }
+            //    else
+            //    {
+            //        variables = _dialogueData.booleans;
+            //    }
+            //}
+            //else
+            //{
+            //    if (node.variableType == VariableEditorTypes.Float)
+            //    {
+            //        variables = _dialogueData.dialogues[currentDialogue].floats;
+            //    }
+            //    else if (node.variableType == VariableEditorTypes.String)
+            //    {
+            //        variables = _dialogueData.dialogues[currentDialogue].strings;
+            //    }
+            //    else
+            //    {
+            //        variables = _dialogueData.dialogues[currentDialogue].booleans;
+            //    }
+            //}
+
+            Rect topRowRect = new Rect(baseRect.x + 5, baseRect.yMax, width - 10, 25);
+            if (GUI.Toggle(new Rect(topRowRect.x, topRowRect.y, (width - 10) * 0.5f, 25), (node.variableScope == VariableEditorScopes.Global), "Global"))
+            {
+                node.variableScope = VariableEditorScopes.Global;
+                if (node.variableId >= variables.variables.Count) node.variableId = 0;
+            }
+            if (GUI.Toggle(new Rect(topRowRect.x + (topRowRect.width * 0.5f), topRowRect.y, (width - 10) * 0.5f, 25), (node.variableScope == VariableEditorScopes.Local), "Local"))
+            {
+                node.variableScope = VariableEditorScopes.Local;
+                if (node.variableId >= variables.variables.Count) node.variableId = 0;
+            }
+
+            Rect typesRect = new Rect(topRowRect.x, topRowRect.yMax + 5, width - 10, 25);
+            Rect typeBooleanToggleRect = new Rect(typesRect.x, typesRect.y, typesRect.width * 0.33333f, typesRect.height);
+            Rect typeFloatToggleRect = new Rect(typesRect.x + (typesRect.width * 0.33333f), typesRect.y, typesRect.width * 0.33333f, typesRect.height);
+            Rect typeStringToggleRect = new Rect(typesRect.x + ((typesRect.width * 0.33333f) * 2), typesRect.y, typesRect.width * 0.33333f, typesRect.height);
+
+            if (GUI.Toggle(typeBooleanToggleRect, (node.variableType == VariableEditorTypes.Boolean), "Booleans"))
+            {
+                node.variableType = VariableEditorTypes.Boolean;
+                if (node.variableId >= variables.variables.Count) node.variableId = 0;
+            }
+            if (GUI.Toggle(typeFloatToggleRect, (node.variableType == VariableEditorTypes.Float), "Floats"))
+            {
+                node.variableType = VariableEditorTypes.Float;
+                if (node.variableId >= variables.variables.Count) node.variableId = 0;
+            }
+            if (GUI.Toggle(typeStringToggleRect, (node.variableType == VariableEditorTypes.String), "Strings"))
+            {
+                node.variableType = VariableEditorTypes.String;
+                if (node.variableId >= variables.variables.Count) node.variableId = 0;
+            }
+
+            // ------------------ SCROLL BOX
+            // VISUALS
+            Rect scrollRect = new Rect(typesRect.x + 2, typesRect.yMax + 7, width - 14, 100);
+
+            GUI.Box(scrollRect,  string.Empty);
+            
+            // MOUSE HANDLING
+            int rowHeight = 20;
+            int rowSpacing = (EditorGUIUtility.isProSkin) ? 1 : -1;
+            int newScrollHeight = (scrollRect.height > ((rowHeight + rowSpacing) * variables.variables.Count)) ? (int)scrollRect.height : (rowHeight + rowSpacing) * variables.variables.Count;
+            Rect scrollContentRect = new Rect(0, 0, scrollRect.width - 15, newScrollHeight);
+            Vector2 mouseClickPosition = Vector2.zero;
+            if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && scrollRect.Contains(Event.current.mousePosition))
+            {
+                mouseClickPosition = new Vector2(Event.current.mousePosition.x - scrollRect.x - 3, Event.current.mousePosition.y - scrollRect.y - 3 + node.variableScrollPosition.y);
+            }
+            //START SCROLL VIEW
+            node.variableScrollPosition = GUI.BeginScrollView(scrollRect, node.variableScrollPosition, scrollContentRect, false, true);
+
+            //GUI.color = (isPro) ? new Color(1, 1, 1, 0.25f) : new Color(1, 1, 1, 0.1f);
+            //GUI.DrawTextureWithTexCoords(
+            //    scrollContentRect,
+            //    DialogueEditorGUI.scrollboxBgTexture,
+            //    new Rect(0, 0, scrollContentRect.width / DialogueEditorGUI.scrollboxBgTexture.width, scrollContentRect.height / DialogueEditorGUI.scrollboxBgTexture.height)
+            //);
+            //GUI.color = GUI.contentColor;
+
+            for (int i = 0; i < variables.variables.Count; i += 1)
+            {
+                Rect row = new Rect(0, 0 + ((rowHeight + rowSpacing) * i), scrollRect.width - 15, 20);
+                if (mouseClickPosition != Vector2.zero && row.Contains(mouseClickPosition))
+                {
+                    node.variableId = i;
+                }
+                GUI.color = new Color(1, 1, 1, 0.5f);
+                GUI.Box(row, string.Empty);
+                if (i == node.variableId)
+                {
+                    GUI.Box(row, string.Empty);
+                    GUI.Box(row, string.Empty);
+                    
+                }
+
+                if (row.Contains(Event.current.mousePosition))
+                {
+                    GUI.color = Color.white;
+                    GUI.Box(row, string.Empty);
+                    GUI.Box(row, string.Empty);
+                    GUI.Box(row, string.Empty);
+                    
+                }
+
+                GUI.color = GUI.contentColor;
+
+                Rect labelNumberRow = new Rect(row.x + 2, row.y + 2, row.width - 4, row.height - 4);
+                Rect labelNameRow = new Rect(labelNumberRow.x + 25, labelNumberRow.y, labelNumberRow.width - 25, labelNumberRow.height);
+                GUI.Label(labelNumberRow, variables.variables[i].id.ToString());
+                string labelNameText = (variables.variables[i].name != string.Empty) ? variables.variables[i].name : string.Empty;
+                GUI.Label(labelNameRow, labelNameText);
+                GUI.color = new Color(1, 1, 1, 0.5f);
+                GUI.Label(labelNameRow, (variables.variables[i].variable != string.Empty) ? labelNameText + ": " + variables.variables[i].variable : string.Empty);
+                GUI.color = GUI.contentColor;
+            }
+            // END SCROLL VIES
+            GUI.EndScrollView();
+
+            Rect outputRect = new Rect(baseRect.x, baseRect.y, width, 195);
+            //DialogueEditorGUI.drawShadowedRect(outputRect);
+            return outputRect;
         }
 
         // TEXT BASE
@@ -1245,9 +1438,363 @@ namespace Catharsis.DialogueEditor
             
 
             Rect outputButtonRect = new Rect(textBoxTitleRect.x + textBoxRect.width - 28, textBoxTitleRect.y + 2, 16, 16);
+
+           
             DrawOutputConnector(node, new Vector2(outputButtonRect.x, outputButtonRect.y), 0);
 
             DrawTextNodeAdvanced(node, 130, (int)baseRect.width);
+        }
+
+        // draw BRANCHED TEXT
+        private void DrawBranchedMessageNode(DialogueEditorNodeObject node)
+        {
+            int choiceRectHeight = 55;
+            int advancedHeight = (node.advanced) ? 303 : 0;
+            Rect baseRect = DrawTextNodeBase(node, 132 + advancedHeight + ((choiceRectHeight + 5) * node.outs.Count));
+
+            Rect textBoxRect = new Rect(baseRect.x + 5, baseRect.y + baseRect.height, baseRect.width - 10, 102);
+            Rect textBoxTitleRect = new Rect(textBoxRect.x + 5, textBoxRect.y + 5, textBoxRect.width - 10 - 105 - 80, 20);
+
+            GUI.Box(textBoxRect, string.Empty);
+            GUI.Box(textBoxTitleRect, string.Empty);
+            
+            GUI.Label(new Rect(textBoxTitleRect.x + 3, textBoxTitleRect.y + 2, textBoxTitleRect.width - 2, 20), "Body Text");
+            Rect textFieldRect = new Rect(textBoxRect.x + 6, textBoxRect.y + 4 + textBoxTitleRect.height + 6, textBoxRect.width - 12, textBoxRect.height - textBoxTitleRect.height - 16);
+
+            GUI.Box(textFieldRect,  string.Empty);
+            
+            node.text = GUI.TextArea(textFieldRect, node.text);
+
+            Rect advancedButtonRect = new Rect(textBoxTitleRect.xMax + 5, textBoxRect.y + 6, 70, textBoxTitleRect.height);
+            node.advanced = GUI.Toggle(advancedButtonRect, node.advanced, "Advanced");
+
+            Rect buttonsRect = new Rect(baseRect.xMax - 110, textBoxTitleRect.y, 100, 20);
+
+            Rect addButtonRect = new Rect(buttonsRect.x, buttonsRect.y, buttonsRect.width * 0.5f, buttonsRect.height);
+            if (node.outs.Count < 10)
+            {
+                if (GUI.Button(addButtonRect, "Add"))
+                {
+                    node.AddNewChoice();
+                }
+            }
+            else
+            {
+                GUI.color = new Color(1, 1, 1, 0.5f);
+                GUI.Button(addButtonRect, "Add");
+                GUI.color = GUI.contentColor;
+            }
+
+            Rect removeButtonRect = new Rect(buttonsRect.x + (buttonsRect.width * 0.5f), buttonsRect.y, buttonsRect.width * 0.5f, buttonsRect.height);
+            if (node.outs.Count > 2)
+            {
+                if (GUI.Button(removeButtonRect, "Remove"))
+                {
+                    node.RemoveChoice();
+                }
+            }
+            else
+            {
+                GUI.color = new Color(1, 1, 1, 0.5f);
+                GUI.Button(removeButtonRect, "Remove");
+                GUI.color = GUI.contentColor;
+            }
+
+            for (int i = 0; i < node.outs.Count; i += 1)
+            {
+                Rect outerChoiceRect = new Rect(baseRect.x + 5, textBoxRect.yMax + 5 + ((choiceRectHeight + 5) * i), baseRect.width - 10, choiceRectHeight);
+                Rect choiceTitleRect = new Rect(outerChoiceRect.x + 5, outerChoiceRect.y + 5, outerChoiceRect.width - 10, 20);
+
+                GUI.Box(outerChoiceRect, string.Empty);
+                GUI.Box(choiceTitleRect, string.Empty);
+                
+                GUI.Label(new Rect(choiceTitleRect.x + 2, choiceTitleRect.y + 2, choiceTitleRect.width, choiceTitleRect.height), "Choice " + (i + 1));
+
+                Rect choiceRect = new Rect(choiceTitleRect.x + 2, choiceTitleRect.yMax + 5 + 2, choiceTitleRect.width - 4, 17);
+                GUI.Box(choiceRect, string.Empty);
+                
+                node.choices[i] = GUI.TextField(choiceRect, node.choices[i]);
+
+                Rect outputButtonRect = new Rect(choiceTitleRect.x + choiceTitleRect.width - 18, choiceTitleRect.y + 2, 16, 16);
+                DrawOutputConnector(node, new Vector2(outputButtonRect.x, outputButtonRect.y), i);
+            }
+
+            DrawTextNodeAdvanced(node, 130 + (node.outs.Count * 60), (int)baseRect.width);
+        }
+
+        // draw SET VARIABLE
+        private void DrawSetVariableNode(DialogueEditorNodeObject node)
+        {
+            Rect baseRect = DrawVariableNodeBase(node, 288);
+
+            Rect setEditorRect = new Rect(baseRect.x + 5, baseRect.yMax, baseRect.width - 10, 87);
+            Rect setEditorTitleRect = new Rect(setEditorRect.x + 5, setEditorRect.y + 5, setEditorRect.width - 10, 20);
+
+            GUI.Box(setEditorRect, string.Empty);
+            GUI.Box(setEditorTitleRect,string.Empty);
+            
+
+            GUI.Label(new Rect(setEditorTitleRect.x + 2, setEditorTitleRect.y + 2, setEditorTitleRect.width, 20), "Output");
+
+            Rect equationTypeRect = new Rect(setEditorTitleRect.x, setEditorTitleRect.yMax + 5, setEditorTitleRect.width, 25);
+            Rect inputRect = new Rect(equationTypeRect.x, equationTypeRect.yMax + 5, equationTypeRect.width, 20);
+            if (node.variableType == VariableEditorTypes.Boolean)
+            {
+                //FOR BOOLEANS
+                if (node.variableSetEquation != VariableEditorSetEquation.Equals && node.variableSetEquation != VariableEditorSetEquation.Toggle)
+                {
+                    node.variableSetEquation = VariableEditorSetEquation.Equals;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width * 0.5f) * 0), equationTypeRect.y, (equationTypeRect.width) * 0.5f, 25), (node.variableSetEquation == VariableEditorSetEquation.Equals), "="))
+                {
+                    node.variableSetEquation = VariableEditorSetEquation.Equals;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width * 0.5f) * 1), equationTypeRect.y, (equationTypeRect.width) * 0.5f, 25), (node.variableSetEquation == VariableEditorSetEquation.Toggle), "Toggle"))
+                {
+                    node.variableSetEquation = VariableEditorSetEquation.Toggle;
+                    node.variableSetValue = "toggle";
+                }
+            }
+            else if (node.variableType == VariableEditorTypes.Float)
+            {
+                //FOR FLOATS
+                if (node.variableSetEquation != VariableEditorSetEquation.Equals && node.variableSetEquation != VariableEditorSetEquation.Add && node.variableSetEquation != VariableEditorSetEquation.Subtract && node.variableSetEquation != VariableEditorSetEquation.Multiply && node.variableSetEquation != VariableEditorSetEquation.Divide)
+                {
+                    node.variableSetEquation = VariableEditorSetEquation.Equals;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width * 0.2f) * 0), equationTypeRect.y, (equationTypeRect.width) * 0.2f, 25), (node.variableSetEquation == VariableEditorSetEquation.Equals), "="))
+                {
+                    node.variableSetEquation = VariableEditorSetEquation.Equals;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width * 0.2f) * 1), equationTypeRect.y, (equationTypeRect.width) * 0.2f, 25), (node.variableSetEquation == VariableEditorSetEquation.Add), "+"))
+                {
+                    node.variableSetEquation = VariableEditorSetEquation.Add;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width * 0.2f) * 2), equationTypeRect.y, (equationTypeRect.width) * 0.2f, 25), (node.variableSetEquation == VariableEditorSetEquation.Subtract), "-"))
+                {
+                    node.variableSetEquation = VariableEditorSetEquation.Subtract;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width * 0.2f) * 3), equationTypeRect.y, (equationTypeRect.width) * 0.2f, 25), (node.variableSetEquation == VariableEditorSetEquation.Multiply), "x"))
+                {
+                    node.variableSetEquation = VariableEditorSetEquation.Multiply;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width * 0.2f) * 4), equationTypeRect.y, (equationTypeRect.width) * 0.2f, 25), (node.variableSetEquation == VariableEditorSetEquation.Divide), "/"))
+                {
+                    node.variableSetEquation = VariableEditorSetEquation.Divide;
+                }
+            }
+            else if (node.variableType == VariableEditorTypes.String)
+            {
+                // FOR STRINGS
+                if (node.variableSetEquation != VariableEditorSetEquation.Equals && node.variableSetEquation != VariableEditorSetEquation.Add)
+                {
+                    node.variableSetEquation = VariableEditorSetEquation.Equals;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width * 0.5f) * 0), equationTypeRect.y, (equationTypeRect.width) * 0.5f, 25), (node.variableSetEquation == VariableEditorSetEquation.Equals), "="))
+                {
+                    node.variableSetEquation = VariableEditorSetEquation.Equals;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width * 0.5f) * 1), equationTypeRect.y, (equationTypeRect.width) * 0.5f, 25), (node.variableSetEquation == VariableEditorSetEquation.Add), "+"))
+                {
+                    node.variableSetEquation = VariableEditorSetEquation.Add;
+                }
+            }
+
+            if (node.variableType == VariableEditorTypes.Boolean)
+            {
+                if (GUI.Toggle(new Rect(inputRect.x + ((inputRect.width * 0.5f) * 0), inputRect.y, (inputRect.width) * 0.5f, inputRect.height), (node.variableSetValue == "true"), "True"))
+                {
+                    node.variableSetValue = "true";
+                }
+                if (GUI.Toggle(new Rect(inputRect.x + ((inputRect.width * 0.5f) * 1), inputRect.y, (inputRect.width) * 0.5f, inputRect.height), (node.variableSetValue == "false"), "False"))
+                {
+                    node.variableSetValue = "false";
+                }
+            }
+            else
+            {
+                Rect newInputRect = new Rect(inputRect.x + 3, inputRect.y + 2, inputRect.width - 6, inputRect.height - 4);
+
+                GUI.Box(newInputRect, string.Empty);
+                
+                if (node.variableType == VariableEditorTypes.Float)
+                {
+                    float floatVar;
+                    float.TryParse(node.variableSetValue, out floatVar);
+                    node.variableSetValue = EditorGUI.FloatField(newInputRect, floatVar).ToString();
+                }
+                else
+                {
+                    node.variableSetValue = GUI.TextField(newInputRect, node.variableSetValue);
+                }
+            }
+
+            Rect outputButtonRect = new Rect(setEditorTitleRect.x + setEditorTitleRect.width - 18, setEditorTitleRect.y + 2, 16, 16);
+            DrawOutputConnector(node, new Vector2(outputButtonRect.x, outputButtonRect.y), 0);
+
+        }
+
+        // draw CONDITIONAL
+        private void DrawConditionalNode(DialogueEditorNodeObject node)
+        {
+            Rect baseRect = DrawVariableNodeBase(node, 310);
+
+            Rect ifRect = new Rect(baseRect.x + 5, baseRect.yMax, baseRect.width - 10, 110);
+            Rect ifTitleRect = new Rect(ifRect.x + 5, ifRect.y + 5, ifRect.width - 10, 20);
+
+            GUI.Box(ifRect, string.Empty);
+            GUI.Box(ifTitleRect, string.Empty);
+            
+
+            GUI.Label(new Rect(ifTitleRect.x + 2, ifTitleRect.y + 2, ifTitleRect.width, 20), "If");
+
+            Rect equationTypeRect = new Rect(ifTitleRect.x, ifTitleRect.yMax + 5, ifTitleRect.width, 25);
+            Rect inputRect = new Rect(equationTypeRect.x, equationTypeRect.yMax + 5, equationTypeRect.width, 20);
+            if (node.variableType == VariableEditorTypes.Boolean)
+            {
+                //FOR BOOLEANS
+                if (node.variableGetEquation != VariableEditorGetEquation.Equals && node.variableGetEquation != VariableEditorGetEquation.NotEquals)
+                {
+                    node.variableGetEquation = VariableEditorGetEquation.Equals;
+                }
+
+                if (node.variableGetValue != "true" && node.variableGetValue != "false")
+                {
+                    node.variableGetValue = "true";
+                }
+
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width * 0.5f) * 0), equationTypeRect.y, (equationTypeRect.width) * 0.5f, 25), (node.variableGetEquation == VariableEditorGetEquation.Equals), "=="))
+                {
+                    node.variableGetEquation = VariableEditorGetEquation.Equals;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width * 0.5f) * 1), equationTypeRect.y, (equationTypeRect.width) * 0.5f, 25), (node.variableGetEquation == VariableEditorGetEquation.NotEquals), "!="))
+                {
+                    node.variableGetEquation = VariableEditorGetEquation.NotEquals;
+                }
+            }
+            else if (node.variableType == VariableEditorTypes.Float)
+            {
+                //FOR FLOATS
+                if (node.variableGetEquation != VariableEditorGetEquation.Equals && node.variableGetEquation != VariableEditorGetEquation.NotEquals && node.variableGetEquation != VariableEditorGetEquation.GreaterThan && node.variableGetEquation != VariableEditorGetEquation.LessThan && node.variableGetEquation != VariableEditorGetEquation.EqualOrGreaterThan && node.variableGetEquation != VariableEditorGetEquation.EqualOrLessThan)
+                {
+                    node.variableGetEquation = VariableEditorGetEquation.Equals;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width / 6) * 0), equationTypeRect.y, (equationTypeRect.width) / 6, 25), (node.variableGetEquation == VariableEditorGetEquation.Equals), "=="))
+                {
+                    node.variableGetEquation = VariableEditorGetEquation.Equals;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width / 6) * 1), equationTypeRect.y, (equationTypeRect.width) / 6, 25), (node.variableGetEquation == VariableEditorGetEquation.NotEquals), "!="))
+                {
+                    node.variableGetEquation = VariableEditorGetEquation.NotEquals;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width / 6) * 2), equationTypeRect.y, (equationTypeRect.width) / 6, 25), (node.variableGetEquation == VariableEditorGetEquation.GreaterThan), ">"))
+                {
+                    node.variableGetEquation = VariableEditorGetEquation.GreaterThan;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width / 6) * 3), equationTypeRect.y, (equationTypeRect.width) / 6, 25), (node.variableGetEquation == VariableEditorGetEquation.LessThan), "<"))
+                {
+                    node.variableGetEquation = VariableEditorGetEquation.LessThan;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width / 6) * 4), equationTypeRect.y, (equationTypeRect.width) / 6, 25), (node.variableGetEquation == VariableEditorGetEquation.EqualOrGreaterThan), ">="))
+                {
+                    node.variableGetEquation = VariableEditorGetEquation.EqualOrGreaterThan;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width / 6f) * 5), equationTypeRect.y, (equationTypeRect.width) / 6, 25), (node.variableGetEquation == VariableEditorGetEquation.EqualOrLessThan), "<="))
+                {
+                    node.variableGetEquation = VariableEditorGetEquation.EqualOrLessThan;
+                }
+            }
+            else if (node.variableType == VariableEditorTypes.String)
+            {
+                // FOR STRINGS
+                if (node.variableGetEquation != VariableEditorGetEquation.Equals && node.variableGetEquation != VariableEditorGetEquation.NotEquals)
+                {
+                    node.variableGetEquation = VariableEditorGetEquation.Equals;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width * 0.5f) * 0), equationTypeRect.y, (equationTypeRect.width) * 0.5f, 25), (node.variableGetEquation == VariableEditorGetEquation.Equals), "=="))
+                {
+                    node.variableGetEquation = VariableEditorGetEquation.Equals;
+                }
+                if (GUI.Toggle(new Rect(equationTypeRect.x + ((equationTypeRect.width * 0.5f) * 1), equationTypeRect.y, (equationTypeRect.width) * 0.5f, 25), (node.variableGetEquation == VariableEditorGetEquation.NotEquals), "!="))
+                {
+                    node.variableGetEquation = VariableEditorGetEquation.NotEquals;
+                }
+            }
+
+            if (node.variableType == VariableEditorTypes.Boolean)
+            {
+                if (GUI.Toggle(new Rect(inputRect.x + ((inputRect.width * 0.5f) * 0), inputRect.y, (inputRect.width) * 0.5f, inputRect.height), (node.variableSetValue == "true"), "True"))
+                {
+                    node.variableSetValue = "true";
+                }
+                if (GUI.Toggle(new Rect(inputRect.x + ((inputRect.width * 0.5f) * 1), inputRect.y, (inputRect.width) * 0.5f, inputRect.height), (node.variableSetValue == "false"), "False"))
+                {
+                    node.variableSetValue = "false";
+                }
+            }
+            else
+            {
+                Rect newInputRect = new Rect(inputRect.x + 3, inputRect.y + 2, inputRect.width - 6, 18);
+                GUI.Box(newInputRect, string.Empty);
+                
+                if (node.variableType == VariableEditorTypes.Float)
+                {
+                    float floatVar;
+                    float.TryParse(node.variableGetValue, out floatVar);
+                    node.variableGetValue = EditorGUI.FloatField(newInputRect, floatVar).ToString();
+                }
+                else
+                {
+                    node.variableGetValue = GUI.TextField(newInputRect, node.variableGetValue);
+                }
+            }
+
+            Rect ifOutputButtonRect = new Rect(ifTitleRect.x + ifTitleRect.width - 18, ifTitleRect.y + 2, 16, 16);
+            DrawOutputConnector(node, new Vector2(ifOutputButtonRect.x, ifOutputButtonRect.y), 0);
+
+            Rect elseTitleRect = new Rect(ifTitleRect.x, ifRect.yMax - 25, ifTitleRect.width, ifTitleRect.height);
+
+            GUI.Box(elseTitleRect,string.Empty);
+            
+            GUI.Label(new Rect(elseTitleRect.x + 2, elseTitleRect.y + 2, elseTitleRect.width, elseTitleRect.height), "Else");
+            Rect elseOutputButtonRect = new Rect(elseTitleRect.x + elseTitleRect.width - 18, elseTitleRect.y + 2, 16, 16);
+            DrawOutputConnector(node, new Vector2(elseOutputButtonRect.x, elseOutputButtonRect.y), 1);
+        }
+
+        // draw SEND MESSAGE
+        private void DrawEventNode(DialogueEditorNodeObject node)
+        {
+            Rect baseRect = DrawNodeBase(node, 200, 135);
+
+            Rect sendMessageRect = new Rect(baseRect.x + 5, baseRect.yMax, baseRect.width - 10, 105);
+            Rect sendMessageTitleRect = new Rect(sendMessageRect.x + 5, sendMessageRect.y + 5, sendMessageRect.width - 10, 20);
+            Rect messageInputRect = new Rect(sendMessageTitleRect.x + 2, sendMessageTitleRect.yMax + 5, sendMessageTitleRect.width - 4, 18);
+            Rect metadataTitleRect = new Rect(sendMessageRect.x + 5, messageInputRect.yMax + 5, sendMessageRect.width - 10, 20);
+            Rect metadataInputRect = new Rect(metadataTitleRect.x + 2, metadataTitleRect.yMax + 5, metadataTitleRect.width - 4, 18);
+
+            GUI.Box(sendMessageRect, string.Empty);
+            GUI.Box(sendMessageTitleRect, string.Empty);
+            GUI.Box(messageInputRect, string.Empty);
+            GUI.Box(metadataTitleRect, string.Empty);
+            GUI.Box(metadataInputRect, string.Empty);
+            
+
+            GUI.Label(new Rect(sendMessageTitleRect.x + 2, sendMessageTitleRect.y + 2, sendMessageTitleRect.width, sendMessageTitleRect.height), "Message Name");
+            node.eventName = GUI.TextField(messageInputRect, node.eventName);
+            GUI.Label(new Rect(metadataTitleRect.x + 2, metadataTitleRect.y + 2, metadataTitleRect.width, metadataTitleRect.height), "Metadata");
+            node.metadata = GUI.TextField(metadataInputRect, node.metadata);
+
+            Rect outputButtonRect = new Rect(sendMessageTitleRect.x + sendMessageTitleRect.width - 18, sendMessageTitleRect.y + 2, 16, 16);
+            DrawOutputConnector(node, new Vector2(outputButtonRect.x, outputButtonRect.y), 0);
+
+        }
+
+        // draw END
+        private void DrawEndNode(DialogueEditorNodeObject node)
+        {
+            int width = 100;
+            int height = 24;
+            DrawNodeBase(node, width, height);
         }
         #endregion
 
@@ -1260,7 +1807,7 @@ namespace Catharsis.DialogueEditor
 
         private void RemoveDialogue(int indexOfDialogue)
         {
-            _dialogueData.RemoveDialogue(indexOfDialogue);
+            _dialogueData.RemoveDialogue(indexOfDialogue, out currentDialogue);
         }
         #endregion
     }
