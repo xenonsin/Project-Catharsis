@@ -4,39 +4,25 @@ using UnityEngine;
 
 namespace Catharsis.DialogueEditor.Model
 {
+    [System.Serializable]
     public class DialogueEditorData
     {
-
+        public string scenarioName;
 
         public List<DialogueEditorDialogueObject> dialogues;
-
+        public DialogueEditorGlobalVariablesContainer globals;
         public int DialogueCount { get { return dialogues.Count; } }
 
         private int _currentDialogueId;
 
-        public int CurrentDialogueId
-        {
-            get { return _currentDialogueId; }
-            set
-            {
-                _currentDialogueId = Mathf.Clamp(value, 0, DialogueCount - 1);
-            }
-        }
+
         public DialogueEditorData()
         {
+            scenarioName = "newScenario";
             dialogues = new List<DialogueEditorDialogueObject>();
+            globals = new DialogueEditorGlobalVariablesContainer();
         }
 
-
-        public void Load()
-        {
-            
-        }
-
-        public void Save()
-        {
-            
-        }
 
         //Adds Dialogue at the end of the list.
         //BUG: Currently this just gets the count then continues from there.. even if the id already exists.

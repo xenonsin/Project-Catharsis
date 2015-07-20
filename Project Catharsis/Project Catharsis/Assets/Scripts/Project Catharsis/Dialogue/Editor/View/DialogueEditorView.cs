@@ -14,7 +14,7 @@ namespace Catharsis.DialogueEditor
         #region Menu Options
         public enum FileMenuOptions
         {
-            SaveScenario = 0, LoadScenario, NewDialogue, AddMessageNode, AddBranchingMessageNode, AddConditionalNode, AddSetVariableNode, AddGenericEventNode, AddEndNode,
+            SaveScenario = 0, SaveScenarioAs, LoadScenario, NewDialogue, AddMessageNode, AddBranchingMessageNode, AddConditionalNode, AddSetVariableNode, AddGenericEventNode, AddEndNode,
         }
 
         public enum EditMenuOptions
@@ -30,9 +30,9 @@ namespace Catharsis.DialogueEditor
 
         //probably put this in the mediator?
         [SerializeField]
-        private DialogueEditorData _dialogueData;
+        private DialogueEditorDataManager _dialogueData;
         [SerializeField]
-        private string lastScenario;
+        private string currentScenario;
 
         [SerializeField]
         private Vector2 _hierarchyScrollPos = Vector2.zero;
@@ -96,20 +96,17 @@ namespace Catharsis.DialogueEditor
             InitNodeTypes();
             if (_dialogueData == null)
             {
-                Debug.Log("Loading last scenario: " + lastScenario);
-                _dialogueData = new DialogueEditorData();
-                Load(lastScenario);
+                Debug.Log("Loading last scenario: " + currentScenario);
+                _dialogueData = new DialogueEditorDataManager();
+                //LoadScenario(lastScenario);
             }
             //Init();
         }
 
+
+
         private void Init()
-        {
-            if (currentDialogue == null)
-                currentDialogue = 0;
-            if (currentNode == null)
-                currentNode = 0;
-            
+        {     
             _outputSelection = null;
 
             if (_nodeTypes == null)
@@ -146,33 +143,45 @@ namespace Catharsis.DialogueEditor
 
                 DisplayNodePanel();
                 DisplayHierarchyPanel();
-
-
-
-
-               
+             
             }
             DisplayToolBar();
         }
 
-        private void Load(string nameOfScenario)
+        private void LoadScenario(string nameOfScenario)
         {
-            //This one will automatically load from the lastScenario
+            bool assetExists = System.IO.File.Exists(nameOfScenario);
+            if (assetExists)
+            {
+                _dialogueData.Load(nameOfScenario);
+            }
+            else
+            {
+                Debug.LogWarning("name of Asset doesn't exist!");
+            }
         }
 
-        private void Load()
+        private void LoadScenario()
         {
-            //This one will prompt the user with a window..
+            string file = EditorUtility.OpenFilePanel("Import input profile", "", "xml");
+            if (string.IsNullOrEmpty(file))
+                return;
+            _dialogueData.Load(file);
+
+            Repaint();
+
+            currentScenario = file;
         }
         private void Save()
         {
-            
+            //NEED TO CHECK IF LOADED.
         }
 
-        private void SetConfigurations()
+        private void SaveAs()
         {
             
         }
+
 
         private void LoadBgTexture()
         {
@@ -209,11 +218,11 @@ namespace Catharsis.DialogueEditor
 
             GUI.Box(nameShadowRect, string.Empty);
 
-            if (currentDialogue < _dialogueData.DialogueCount && currentDialogue >= 0)
+            if (currentDialogue < _dialogueData.data.DialogueCount && currentDialogue >= 0)
             {
-                _dialogueData.dialogues[currentDialogue].name = GUI.TextField(nameRect, _dialogueData.dialogues[currentDialogue].name, nameTextStyle);
+                _dialogueData.data.dialogues[currentDialogue].name = GUI.TextField(nameRect, _dialogueData.data.dialogues[currentDialogue].name, nameTextStyle);
                 GUI.color = new Color(1, 1, 1, 0.25f);
-                if (_dialogueData.dialogues[currentDialogue].name == "") 
+                if (_dialogueData.data.dialogues[currentDialogue].name == "") 
                     GUI.Label(nameRect, "Dialogue Name", nameTextStyle);
             }
 
@@ -246,12 +255,12 @@ namespace Catharsis.DialogueEditor
                 }
 			
                 buttonRects[i] = new Rect(toolbarInnerRect.x + nodeButtonSize * i, toolbarInnerRect.y, nodeButtonSize, nodeButtonSize);
-                if (GUI.Button(buttonRects[i], _nodeTypes[i].icon, toolStyle))
+                if (GUI.Button(buttonRects[i], _nodeTypes[i].icon, toolStyle) && _dialogueData.data.DialogueCount > 0)
                 {
                     Vector2 newNodePosition = Vector2.zero;
-                    newNodePosition.x = _dialogueData.dialogues[currentDialogue].scrollPosition.x + 20;
-                    newNodePosition.y = _dialogueData.dialogues[currentDialogue].scrollPosition.y + 20;
-                    _dialogueData.dialogues[currentDialogue].AddNode(_nodeTypes[i].type, newNodePosition);
+                    newNodePosition.x = _dialogueData.data.dialogues[currentDialogue].scrollPosition.x + 20;
+                    newNodePosition.y = _dialogueData.data.dialogues[currentDialogue].scrollPosition.y + 20;
+                    _dialogueData.data.dialogues[currentDialogue].AddNode(_nodeTypes[i].type, newNodePosition);
                     //Debug.Log(_dialogueData.dialogues[currentDialogue].nodes[0].outs[0]);
 
                 }
@@ -300,7 +309,7 @@ namespace Catharsis.DialogueEditor
             //GUIStyle canvasStyle = new GUIStyle(GUI.skin.GetStyle("Scene"));
             
 
-            if (_dialogueData.dialogues.Count < 1)
+            if (_dialogueData.data.dialogues.Count < 1)
             {
                 GUI.BeginScrollView(scrollRect, GetScrollPosition(), new Rect(0, 0, newScrollSize.x, newScrollSize.y), true, true);
                 GUI.EndScrollView();
@@ -314,7 +323,7 @@ namespace Catharsis.DialogueEditor
             {
                 //GUI.BeginScrollView(canvasRect, GetScrollPosition(), new Rect(0, 0, newScrollSize.x, newScrollSize.y), true, true);
 
-                _dialogueData.dialogues[currentDialogue].scrollPosition = GUI.BeginScrollView(scrollRect, GetScrollPosition(), new Rect(0, 0, newScrollSize.x, newScrollSize.y), true, true);
+                _dialogueData.data.dialogues[currentDialogue].scrollPosition = GUI.BeginScrollView(scrollRect, GetScrollPosition(), new Rect(0, 0, newScrollSize.x, newScrollSize.y), true, true);
             }
 
 
@@ -351,8 +360,8 @@ namespace Catharsis.DialogueEditor
 
         private void DrawConnections()
         {
-            if (_dialogueData.dialogues.Count < 1 || currentDialogue >= _dialogueData.dialogues.Count) return;
-            DialogueEditorDialogueObject dialogue = _dialogueData.dialogues[currentDialogue];
+            if (_dialogueData.data.dialogues.Count < 1 || currentDialogue >= _dialogueData.data.dialogues.Count) return;
+            DialogueEditorDialogueObject dialogue = _dialogueData.data.dialogues[currentDialogue];
             Vector2 startButtonPosition = new Vector2(150, 20);
             if (_outputSelection != null)
             {
@@ -408,12 +417,12 @@ namespace Catharsis.DialogueEditor
             {
                 if (Event.current.button == 0)
                 {
-                    _dialogueData.dialogues[currentDialogue].startPage = null;
+                    _dialogueData.data.dialogues[currentDialogue].startPage = null;
                     _outputSelection = new DialogueEditorSelectionObject(true);
                 }
                 else if (Event.current.button == 1)
                 {
-                    _dialogueData.dialogues[currentDialogue].startPage = null;
+                    _dialogueData.data.dialogues[currentDialogue].startPage = null;
                     if (_outputSelection != null && _outputSelection.isStart)
                     {
                         _outputSelection = null;
@@ -427,19 +436,19 @@ namespace Catharsis.DialogueEditor
             // Local Variables
             GUI.color = new Color(1, 1, 1, 0.5f);
             Rect countLabelsRect = new Rect(startLabelRect.x, startLabelRect.y + 18, startLabelRect.width, 22);
-            GUI.Label(new Rect(countLabelsRect.x, countLabelsRect.y, countLabelsRect.width, countLabelsRect.height), "Local Booleans:	" + _dialogueData.dialogues[currentDialogue].booleans.variables.Count);
-            GUI.Label(new Rect(countLabelsRect.x, countLabelsRect.y + 15, countLabelsRect.width, countLabelsRect.height), "Local Floats:		" + _dialogueData.dialogues[currentDialogue].floats.variables.Count);
-            GUI.Label(new Rect(countLabelsRect.x, countLabelsRect.y + 30, countLabelsRect.width, countLabelsRect.height), "Local Strings:		" + _dialogueData.dialogues[currentDialogue].strings.variables.Count);
+            GUI.Label(new Rect(countLabelsRect.x, countLabelsRect.y, countLabelsRect.width, countLabelsRect.height), "Local Booleans:	" + _dialogueData.data.dialogues[currentDialogue].booleans.variables.Count);
+            GUI.Label(new Rect(countLabelsRect.x, countLabelsRect.y + 15, countLabelsRect.width, countLabelsRect.height), "Local Floats:		" + _dialogueData.data.dialogues[currentDialogue].floats.variables.Count);
+            GUI.Label(new Rect(countLabelsRect.x, countLabelsRect.y + 30, countLabelsRect.width, countLabelsRect.height), "Local Strings:		" + _dialogueData.data.dialogues[currentDialogue].strings.variables.Count);
             GUI.color = GUI.contentColor;
         }
 
         private void DrawCanvasContents()
         {
-            if (_dialogueData.DialogueCount > 0 && currentDialogue >= 0 && currentDialogue < _dialogueData.DialogueCount && _dialogueData.dialogues[currentDialogue].nodes.Count > 0)
+            if (_dialogueData.data.DialogueCount > 0 && currentDialogue >= 0 && currentDialogue < _dialogueData.data.DialogueCount && _dialogueData.data.dialogues[currentDialogue].nodes.Count > 0)
             {
-                for (int i = 0; i < _dialogueData.dialogues[currentDialogue].nodes.Count; i += 1)
+                for (int i = 0; i < _dialogueData.data.dialogues[currentDialogue].nodes.Count; i += 1)
                 {
-                    DialogueEditorNodeObject node = _dialogueData.dialogues[currentDialogue].nodes[i];
+                    DialogueEditorNodeObject node = _dialogueData.data.dialogues[currentDialogue].nodes[i];
                     //Debug.Log(_dialogueData.dialogues[currentDialogue].nodes[i].outs[0]); fail
                     switch (node.type)
                     {
@@ -489,7 +498,7 @@ namespace Catharsis.DialogueEditor
 
             // REMOVE
             Rect deleteButtonRect = new Rect((screenRect.width * 0.5f), screenRect.y + 15, (screenRect.width * 0.5f) - 5, 30);
-            if (_dialogueData.DialogueCount > 0)
+            if (_dialogueData.data.DialogueCount > 0)
             {
                 if (GUI.Button(deleteButtonRect, "Delete", EditorStyles.miniButtonRight))
                     RemoveDialogue(currentDialogue);
@@ -511,11 +520,11 @@ namespace Catharsis.DialogueEditor
             _hierarchyScrollPos = EditorGUILayout.BeginScrollView(_hierarchyScrollPos);
 
             
-            for (int i = 0; i < _dialogueData.DialogueCount; i++)
+            for (int i = 0; i < _dialogueData.data.DialogueCount; i++)
             {
 
 
-                DisplayHierarchyDialogueItem(screenRect, i, _dialogueData.dialogues[i].name);
+                DisplayHierarchyDialogueItem(screenRect, i, _dialogueData.data.dialogues[i].name);
 
             }
             
@@ -566,8 +575,8 @@ namespace Catharsis.DialogueEditor
             Rect labelNumberRow = new Rect(configPos.x + 2, configPos.y + 2, configPos.width - 4, configPos.height - 4);
             Rect labelNameRow = new Rect(labelNumberRow.x + 25, labelNumberRow.y, labelNumberRow.width - 25, labelNumberRow.height);
 
-            GUI.Label(labelNumberRow, _dialogueData.dialogues[index].id.ToString());
-            GUI.Label(labelNameRow, (_dialogueData.dialogues[index].name == string.Empty) ? "-" : _dialogueData.dialogues[index].name);
+            GUI.Label(labelNumberRow, _dialogueData.data.dialogues[index].id.ToString());
+            GUI.Label(labelNameRow, (_dialogueData.data.dialogues[index].name == string.Empty) ? "-" : _dialogueData.data.dialogues[index].name);
 
             Repaint();
            
@@ -617,7 +626,7 @@ namespace Catharsis.DialogueEditor
             fileMenu.AddItem(new GUIContent("New Dialogue"), false, HandleFileMenuOption, FileMenuOptions.NewDialogue);
             fileMenu.AddSeparator("");
 
-            if (currentNode >= 1)
+            if (_dialogueData.data.DialogueCount > 0)
             {
                 fileMenu.AddItem(new GUIContent("Add Message Node"), false, HandleFileMenuOption,FileMenuOptions.AddMessageNode);
                 fileMenu.AddItem(new GUIContent("Add Branching Message Node"), false, HandleFileMenuOption,FileMenuOptions.AddBranchingMessageNode);
@@ -646,6 +655,8 @@ namespace Catharsis.DialogueEditor
 
         private void HandleFileMenuOption(object arg)
         {
+
+
             FileMenuOptions option = (FileMenuOptions)arg;
             switch (option)
             {
@@ -653,28 +664,28 @@ namespace Catharsis.DialogueEditor
 
                     break;
                 case FileMenuOptions.LoadScenario:
-
+                    LoadScenario();
                     break;
                 case FileMenuOptions.NewDialogue:
                     AddDialogue(1);
                     break;
                 case FileMenuOptions.AddMessageNode:
- 
+                    AddNode(DialogueEditorNodeTypes.MessageNode);
                     break;
                 case FileMenuOptions.AddBranchingMessageNode:
-
+                    AddNode(DialogueEditorNodeTypes.BranchingMessageNode);
                     break;
                 case FileMenuOptions.AddConditionalNode:
-
+                    AddNode(DialogueEditorNodeTypes.ConditionalNode);
                     break;
                 case FileMenuOptions.AddSetVariableNode:
-
+                    AddNode(DialogueEditorNodeTypes.SetVariableNode);
                     break;
                 case FileMenuOptions.AddGenericEventNode:
-
+                    AddNode(DialogueEditorNodeTypes.GenericEventNode);
                     break;
                 case FileMenuOptions.AddEndNode:
-
+                    AddNode(DialogueEditorNodeTypes.EndNode);
                     break;
             }
         }
@@ -711,7 +722,7 @@ namespace Catharsis.DialogueEditor
             else
                 editMenu.AddDisabledItem(new GUIContent("Duplicate          Shift+D"));
 
-            if (_dialogueData.DialogueCount > 0)
+            if (_dialogueData.data.DialogueCount > 0)
                 editMenu.AddItem(new GUIContent("Delete                Del"), false, HandleEditMenuOption, EditMenuOptions.Delete);
             else
                 editMenu.AddDisabledItem(new GUIContent("Delete                Del"));
@@ -819,7 +830,7 @@ namespace Catharsis.DialogueEditor
         }
         private Vector2 GetNodeOutputPosition(int id, int outputIndex)
         {
-            DialogueEditorNodeObject node = _dialogueData.dialogues[currentDialogue].nodes[id];
+            DialogueEditorNodeObject node = _dialogueData.data.dialogues[currentDialogue].nodes[id];
             Vector2 position = node.position;
 
             switch (node.type)
@@ -858,10 +869,10 @@ namespace Catharsis.DialogueEditor
 
         private void GetNodeScrollLimits()
         {
-            if (_dialogueData.dialogues.Count < 1) return;
+            if (_dialogueData.data.dialogues.Count < 1) return;
 
             int padding = 500;
-            DialogueEditorDialogueObject dialogue = _dialogueData.dialogues[currentDialogue];
+            DialogueEditorDialogueObject dialogue = _dialogueData.data.dialogues[currentDialogue];
             _scrollLimits = Vector2.zero;
             for (int i = 0; i < dialogue.nodes.Count; i += 1)
             {
@@ -873,9 +884,9 @@ namespace Catharsis.DialogueEditor
         private Vector2 GetScrollPosition()
         {
             Vector2 currentScrollPosition;
-            if (_dialogueData.dialogues.Count > 0 && currentDialogue < _dialogueData.dialogues.Count)
+            if (_dialogueData.data.dialogues.Count > 0 && currentDialogue < _dialogueData.data.dialogues.Count)
             {
-                currentScrollPosition = _dialogueData.dialogues[currentDialogue].scrollPosition;
+                currentScrollPosition = _dialogueData.data.dialogues[currentDialogue].scrollPosition;
             }
             else
             {
@@ -905,7 +916,7 @@ namespace Catharsis.DialogueEditor
         private void HandleNodeInputClicked(int nodeId)
         {
 
-            DialogueEditorDialogueObject dialogue = _dialogueData.dialogues[currentDialogue];
+            DialogueEditorDialogueObject dialogue = _dialogueData.data.dialogues[currentDialogue];
             if (_outputSelection != null)
             {
                 if (_outputSelection.isStart)
@@ -923,7 +934,7 @@ namespace Catharsis.DialogueEditor
 
         private void HandleNodeRemoveClick(int nodeId)
         {
-            DialogueEditorDialogueObject dialogue = _dialogueData.dialogues[currentDialogue];
+            DialogueEditorDialogueObject dialogue = _dialogueData.data.dialogues[currentDialogue];
 
             if (dialogue.startPage.HasValue)
             {
@@ -939,7 +950,7 @@ namespace Catharsis.DialogueEditor
             DialogueEditorNodeObject node = null;
             if (Event.current.type == EventType.MouseDrag && _dragSelection != null)
             {
-                node = _dialogueData.dialogues[currentDialogue].nodes[_dragSelection.nodeId];
+                node = _dialogueData.data.dialogues[currentDialogue].nodes[_dragSelection.nodeId];
                 node.position = new Vector2((mousePosition.x + _dragSelection.mouseOffset.x), (mousePosition.y + _dragSelection.mouseOffset.y));
                 if (node.position.x < 10) node.position.x = 10;
                 if (node.position.y < 10) node.position.y = 10;
@@ -947,7 +958,7 @@ namespace Catharsis.DialogueEditor
 
             if (Event.current.type == EventType.MouseUp && _dragSelection != null)
             {
-                node = _dialogueData.dialogues[currentDialogue].nodes[_dragSelection.nodeId];
+                node = _dialogueData.data.dialogues[currentDialogue].nodes[_dragSelection.nodeId];
                 if (node != null)
                 {
                     GetNodeScrollLimits();
@@ -983,7 +994,7 @@ namespace Catharsis.DialogueEditor
             {
                 if (Event.current.button == 2)
                 {
-                    DialogueEditorDialogueObject dialogue = _dialogueData.dialogues[currentDialogue];
+                    DialogueEditorDialogueObject dialogue = _dialogueData.data.dialogues[currentDialogue];
                     //Debug.Log("Dialogue Editor X: " + dialogue.scrollPosition.x);
                     //Debug.Log("Mouse X: " + Event.current.mousePosition.x);
                     dialogue.scrollPosition.x -= (Event.current.mousePosition.x - _panningMousePosition.x) * 1.1f;
@@ -1045,7 +1056,7 @@ namespace Catharsis.DialogueEditor
             }
             if (closeButtonRect.Contains(Event.current.mousePosition))
             {
-               // SetTooltip("This button deletes the current page.\nThis can NOT be undone.");
+               SetTooltip("This button deletes the current page.\nThis can NOT be undone.");
             }
 
             if (Event.current.type == EventType.MouseDown && titleBarRect.Contains(mousePosition))
@@ -1064,49 +1075,36 @@ namespace Catharsis.DialogueEditor
 
             DialogueEditorVariablesContainer variables;
 
-            if (node.variableType == VariableEditorTypes.Float)
+            if (node.variableScope == VariableEditorScopes.Global)
             {
-                variables = _dialogueData.dialogues[currentDialogue].floats;
-            }
-            else if (node.variableType == VariableEditorTypes.String)
-            {
-                variables = _dialogueData.dialogues[currentDialogue].strings;
+                if (node.variableType == VariableEditorTypes.Float)
+                {
+                    variables = _dialogueData.data.globals.floats;
+                }
+                else if (node.variableType == VariableEditorTypes.String)
+                {
+                    variables = _dialogueData.data.globals.strings;
+                }
+                else
+                {
+                    variables = _dialogueData.data.globals.booleans;
+                }
             }
             else
             {
-                variables = _dialogueData.dialogues[currentDialogue].booleans;
+                if (node.variableType == VariableEditorTypes.Float)
+                {
+                    variables = _dialogueData.data.dialogues[currentDialogue].floats;
+                }
+                else if (node.variableType == VariableEditorTypes.String)
+                {
+                    variables = _dialogueData.data.dialogues[currentDialogue].strings;
+                }
+                else
+                {
+                    variables = _dialogueData.data.dialogues[currentDialogue].booleans;
+                }
             }
-
-            //if (node.variableScope == VariableEditorScopes.Global)
-            //{
-            //    if (node.variableType == VariableEditorTypes.Float)
-            //    {
-            //        variables = _dialogueData.floats;
-            //    }
-            //    else if (node.variableType == VariableEditorTypes.String)
-            //    {
-            //        variables = _dialogueData.strings;
-            //    }
-            //    else
-            //    {
-            //        variables = _dialogueData.booleans;
-            //    }
-            //}
-            //else
-            //{
-            //    if (node.variableType == VariableEditorTypes.Float)
-            //    {
-            //        variables = _dialogueData.dialogues[currentDialogue].floats;
-            //    }
-            //    else if (node.variableType == VariableEditorTypes.String)
-            //    {
-            //        variables = _dialogueData.dialogues[currentDialogue].strings;
-            //    }
-            //    else
-            //    {
-            //        variables = _dialogueData.dialogues[currentDialogue].booleans;
-            //    }
-            //}
 
             Rect topRowRect = new Rect(baseRect.x + 5, baseRect.yMax, width - 10, 25);
             if (GUI.Toggle(new Rect(topRowRect.x, topRowRect.y, (width - 10) * 0.5f, 25), (node.variableScope == VariableEditorScopes.Global), "Global"))
@@ -1248,9 +1246,9 @@ namespace Catharsis.DialogueEditor
                 
                 GUI.Label(new Rect(varBox.x + 6, varBox.y + 5, varBox.width - 10, 20), "Variables");
                 Rect globalVariableStringsRect = new Rect(varBox.xMax + 5, varBox.y + 3, 210, varBox.height - 6);
-                //if (GUI.Button(new Rect(globalVariableStringsRect.x + ((globalVariableStringsRect.width / 3) * 0), globalVariableStringsRect.y, globalVariableStringsRect.width / 3, globalVariableStringsRect.height), "Boolean", DialogueEditorGUI.gui.GetStyle("toolbar_left"))) { node.text += "<" + PhaseVarSubStrings.GLOBAL + PhaseVarSubStrings.BOOLEAN + ">" + "0" + "</" + PhaseVarSubStrings.GLOBAL + PhaseVarSubStrings.BOOLEAN + ">"; }
-                //if (GUI.Button(new Rect(globalVariableStringsRect.x + ((globalVariableStringsRect.width / 3) * 1), globalVariableStringsRect.y, globalVariableStringsRect.width / 3, globalVariableStringsRect.height), "Float", DialogueEditorGUI.gui.GetStyle("toolbar_center"))) { node.text += "<" + PhaseVarSubStrings.GLOBAL + PhaseVarSubStrings.FLOAT + ">" + "0" + "</" + PhaseVarSubStrings.GLOBAL + PhaseVarSubStrings.FLOAT + ">"; }
-                //if (GUI.Button(new Rect(globalVariableStringsRect.x + ((globalVariableStringsRect.width / 3) * 2), globalVariableStringsRect.y, globalVariableStringsRect.width / 3, globalVariableStringsRect.height), "String", DialogueEditorGUI.gui.GetStyle("toolbar_right"))) { node.text += "<" + PhaseVarSubStrings.GLOBAL + NodeVarSubStrings.STRING + ">" + "0" + "</" + PhaseVarSubStrings.GLOBAL + PhaseVarSubStrings.STRING + ">"; }
+                if (GUI.Button(new Rect(globalVariableStringsRect.x + ((globalVariableStringsRect.width / 3) * 0), globalVariableStringsRect.y, globalVariableStringsRect.width / 3, globalVariableStringsRect.height), "Boolean")) { node.text += "<" + NodeVarSubStrings.GLOBAL + NodeVarSubStrings.BOOLEAN + ">" + "0" + "</" + NodeVarSubStrings.GLOBAL + NodeVarSubStrings.BOOLEAN + ">"; }
+                if (GUI.Button(new Rect(globalVariableStringsRect.x + ((globalVariableStringsRect.width / 3) * 1), globalVariableStringsRect.y, globalVariableStringsRect.width / 3, globalVariableStringsRect.height), "Float")) { node.text += "<" + NodeVarSubStrings.GLOBAL + NodeVarSubStrings.FLOAT + ">" + "0" + "</" + NodeVarSubStrings.GLOBAL + NodeVarSubStrings.FLOAT + ">"; }
+                if (GUI.Button(new Rect(globalVariableStringsRect.x + ((globalVariableStringsRect.width / 3) * 2), globalVariableStringsRect.y, globalVariableStringsRect.width / 3, globalVariableStringsRect.height), "String")) { node.text += "<" + NodeVarSubStrings.GLOBAL + NodeVarSubStrings.STRING + ">" + "0" + "</" + NodeVarSubStrings.GLOBAL + NodeVarSubStrings.STRING + ">"; }
 
                 /*
                 Rect themeBox = new Rect(baseRect.x + 5, varBox.yMax + 5, baseRect.width - 10, 26);
@@ -1273,7 +1271,7 @@ namespace Catharsis.DialogueEditor
                 GUI.Box(themeBox, string.Empty);
                 
                 GUI.Label(new Rect(themeBox.x + 4, themeBox.y + 5, 100, 20), "Theme:");
-                Rect themeTextFieldRect = new Rect(themeBox.x + 65, themeBox.y + 5, themeBox.width - 65 - 5 - 90, themeBox.height - 10);
+                Rect themeTextFieldRect = new Rect(themeBox.x + 65, themeBox.y + 5, themeBox.width - 65 - 5, themeBox.height - 10);
 
                 GUI.Box(themeTextFieldRect, string.Empty);
                 
@@ -1289,38 +1287,26 @@ namespace Catharsis.DialogueEditor
                 GUI.Box(nameRect, string.Empty);
                 
                 //GUI.Label(new Rect(nameRect.x + 4, nameRect.y + 5, 100, 20), "Name:");
-                //Rect nameTextFieldRect = new Rect(nameRect.x + 65, nameRect.y + 5, nameRect.width - 65 - 5, nameRect.height - 10);
+                Rect nameTextFieldRect = new Rect(nameRect.x + 4, nameRect.y + 5, nameRect.width - 5, nameRect.height - 10);
 
-                //GUI.Box(nameTextFieldRect, string.Empty);
+                node.character = EditorGUI.ObjectField(nameTextFieldRect, "Character:", node.character, typeof(Character), false) as Character;
 
 
-                node.character = EditorGUI.ObjectField(nameRect, "Character:", node.character, typeof(Character), false) as Character;
-                //if (node.character)
-                //{
-                //    if (GUI.Button(nameRect, "Select Character"))
-                //        Selection.objects = EditorUtility.CollectDependencies(new Character[] { node.character });
-                //}
-                //else
-                //{
-                //    EditorGUI.LabelField(nameRect, "Missing:", "Select an object first");
-                //}
-                //if (node.character.name == null) node.character.name = string.Empty;
-                //node.character.name = GUI.TextField(nameTextFieldRect, node.character.name);
+                Rect audioRect = new Rect(nameRect.x, nameRect.yMax + 5, nameRect.width, 26);
 
-                Rect portraitRect = new Rect(nameRect.x, nameRect.yMax + 5, nameRect.width, 26);
-
-                GUI.Box(portraitRect, string.Empty);
+                GUI.Box(audioRect, string.Empty);
                 
-                GUI.Label(new Rect(portraitRect.x + 4, portraitRect.y + 5, 100, 20), "Portrait:");
-                Rect portraitTextFieldRect = new Rect(portraitRect.x + 65, portraitRect.y + 5, portraitRect.width - 65 - 5, portraitRect.height - 10);
+                //GUI.Label(new Rect(portraitRect.x + 4, portraitRect.y + 5, 100, 20), "Portrait:");
+                Rect audioTextFieldRect = new Rect(audioRect.x + 4, audioRect.y + 5, audioRect.width - 5, audioRect.height - 10);
 
-                GUI.Box(portraitTextFieldRect, string.Empty);
+                node.audio = EditorGUI.ObjectField(audioTextFieldRect, "Audio:", node.audio, typeof(AudioClip), false) as AudioClip;
+                //GUI.Box(portraitTextFieldRect, string.Empty);
 
                 //TODO: Display the picture!
                 //if (node.character.portrait2D == null) node.character.portrait2D = null;
                 //node.character.portrait2D = GUI.b(portraitTextFieldRect, node.character.portrait2D);
 
-                Rect metadataRect = new Rect(portraitRect.x, portraitRect.yMax + 5, portraitRect.width, 26);
+                Rect metadataRect = new Rect(audioRect.x, audioRect.yMax + 5, audioRect.width, 26);
 
                 GUI.Box(metadataRect, string.Empty);
                 
@@ -1332,13 +1318,13 @@ namespace Catharsis.DialogueEditor
                 if (node.metadata == null) node.metadata = string.Empty;
                 node.metadata = GUI.TextField(metadataTextFieldRect, node.metadata);
 
-                Rect audioRect = new Rect(metadataRect.x, metadataRect.yMax + 5, metadataRect.width, 48);
+                Rect waitRect = new Rect(metadataRect.x, metadataRect.yMax + 5, metadataRect.width, 48);
 
-                GUI.Box(audioRect, string.Empty);
+                GUI.Box(waitRect, string.Empty);
                 
-                GUI.Label(new Rect(audioRect.x + 4, audioRect.y + 5, 100, 20), "Audio:");
-                Rect audioTextFieldRect = new Rect(audioRect.x + 65, audioRect.y + 5, audioRect.width - 65 - 5, 16);
-                GUI.Box(audioTextFieldRect, string.Empty);
+                GUI.Label(new Rect(waitRect.x + 4, waitRect.y + 5, 100, 20), "Wait:");
+                Rect waitTextFieldRect = new Rect(waitRect.x + 65, waitRect.y + 5, waitRect.width - 65 - 5, 16);
+                GUI.Box(waitTextFieldRect, string.Empty);
                 
                 // FIX THIS SHIT
                 //phase.audio = EditorGUI.ObjectField(audioFileFieldRect, phase.audio, typeof(AudioClip), false) as AudioClip;
@@ -1359,7 +1345,7 @@ namespace Catharsis.DialogueEditor
 
 
                 Rect nodeRect = node.rect;
-                Rect rectRect = new Rect(audioRect.x, audioRect.yMax + 5, audioRect.width, 50);
+                Rect rectRect = new Rect(waitRect.x, waitRect.yMax + 5, waitRect.width, 50);
 
                 GUI.Box(rectRect, string.Empty);
                 
@@ -1802,12 +1788,20 @@ namespace Catharsis.DialogueEditor
 
         private void AddDialogue(int numberOfDialoguesToCreate)
         {
-            _dialogueData.AddDialogue(numberOfDialoguesToCreate, out currentDialogue);
+            _dialogueData.data.AddDialogue(numberOfDialoguesToCreate, out currentDialogue);
         }
 
         private void RemoveDialogue(int indexOfDialogue)
         {
-            _dialogueData.RemoveDialogue(indexOfDialogue, out currentDialogue);
+            _dialogueData.data.RemoveDialogue(indexOfDialogue, out currentDialogue);
+        }
+
+        private void AddNode(DialogueEditorNodeTypes type)
+        {
+            Vector2 newNodePosition = Vector2.zero;
+            newNodePosition.x = _dialogueData.data.dialogues[currentDialogue].scrollPosition.x + 20;
+            newNodePosition.y = _dialogueData.data.dialogues[currentDialogue].scrollPosition.y + 20;
+            _dialogueData.data.dialogues[currentDialogue].AddNode(type, newNodePosition);
         }
         #endregion
     }
