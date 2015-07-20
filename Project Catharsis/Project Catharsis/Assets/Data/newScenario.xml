@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DialogueEditorData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <scenarioName>newScenario</scenarioName>
+  <dialogues>
+    <DialogueEditorDialogueObject>
+      <id>0</id>
+      <dialogueName>test</dialogueName>
+      <startPage>0</startPage>
+      <scrollPosition>
+        <x>0</x>
+        <y>0</y>
+      </scrollPosition>
+      <nodes>
+        <DialogueEditorNodeObject>
+          <id>0</id>
+          <type>MessageNode</type>
+          <theme />
+          <position>
+            <x>218</x>
+            <y>72</y>
+          </position>
+          <outs>
+            <int>1</int>
+          </outs>
+          <advanced>true</advanced>
+          <metadata />
+          <text>tset</text>
+          <character>
+            <name>defaultCharacter</name>
+            <hideFlags>None</hideFlags>
+            <characterName>&lt; Name &gt;</characterName>
+            <portrait2D>
+              <name>defaultPortrait</name>
+              <hideFlags>NotEditable</hideFlags>
+            </portrait2D>
+            <nameColor>
+              <r>1</r>
+              <g>0.921568632</g>
+              <b>0.0156862754</b>
+              <a>1</a>
+            </nameColor>
+          </character>
+          <rect>
+            <x>0</x>
+            <y>0</y>
+            <position>
+              <x>0</x>
+              <y>0</y>
+            </position>
+            <center>
+              <x>0</x>
+              <y>0</y>
+            </center>
+            <min>
+              <x>0</x>
+              <y>0</y>
+            </min>
+            <max>
+              <x>0</x>
+              <y>0</y>
+            </max>
+            <width>0</width>
+            <height>0</height>
+            <size>
+              <x>0</x>
+              <y>0</y>
+            </size>
+            <xMin>0</xMin>
+            <yMin>0</yMin>
+            <xMax>0</xMax>
+            <yMax>0</yMax>
+          </rect>
+          <waitForResponse>true</waitForResponse>
+          <waitType>Seconds</waitType>
+          <waitDuration xsi:nil="true" />
+          <choices />
+          <variableScope>Global</variableScope>
+          <variableType>Boolean</variableType>
+          <variableId>0</variableId>
+          <variableScrollPosition>
+            <x>0</x>
+            <y>0</y>
+          </variableScrollPosition>
+          <variableSetEquation>Equals</variableSetEquation>
+          <variableGetEquation>Equals</variableGetEquation>
+        </DialogueEditorNodeObject>
+        <DialogueEditorNodeObject>
+          <id>1</id>
+          <type>EndNode</type>
+          <position>
+            <x>564</x>
+            <y>60</y>
+          </position>
+          <outs />
+          <advanced>false</advanced>
+          <text />
+          <rect>
+            <x>0</x>
+            <y>0</y>
+            <position>
+              <x>0</x>
+              <y>0</y>
+            </position>
+            <center>
+              <x>0</x>
+              <y>0</y>
+            </center>
+            <min>
+              <x>0</x>
+              <y>0</y>
+            </min>
+            <max>
+              <x>0</x>
+              <y>0</y>
+            </max>
+            <width>0</width>
+            <height>0</height>
+            <size>
+              <x>0</x>
+              <y>0</y>
+            </size>
+            <xMin>0</xMin>
+            <yMin>0</yMin>
+            <xMax>0</xMax>
+            <yMax>0</yMax>
+          </rect>
+          <waitForResponse>false</waitForResponse>
+          <waitType>Seconds</waitType>
+          <waitDuration xsi:nil="true" />
+          <choices />
+          <variableScope>Global</variableScope>
+          <variableType>Boolean</variableType>
+          <variableId>0</variableId>
+          <variableScrollPosition>
+            <x>0</x>
+            <y>0</y>
+          </variableScrollPosition>
+          <variableSetEquation>Equals</variableSetEquation>
+          <variableGetEquation>Equals</variableGetEquation>
+        </DialogueEditorNodeObject>
+      </nodes>
+      <floats>
+        <variables />
+        <selection>0</selection>
+      </floats>
+      <strings>
+        <variables />
+        <selection>0</selection>
+      </strings>
+      <booleans>
+        <variables />
+        <selection>0</selection>
+      </booleans>
+    </DialogueEditorDialogueObject>
+    <DialogueEditorDialogueObject>
+      <id>1</id>
+      <dialogueName>New Dialogue</dialogueName>
+      <startPage xsi:nil="true" />
+      <scrollPosition>
+        <x>0</x>
+        <y>0</y>
+      </scrollPosition>
+      <nodes />
+      <floats>
+        <variables />
+        <selection>0</selection>
+      </floats>
+      <strings>
+        <variables />
+        <selection>0</selection>
+      </strings>
+      <booleans>
+        <variables />
+        <selection>0</selection>
+      </booleans>
+    </DialogueEditorDialogueObject>
+  </dialogues>
+  <globals>
+    <booleans>
+      <variables />
+      <selection>0</selection>
+    </booleans>
+    <floats>
+      <variables />
+      <selection>0</selection>
+    </floats>
+    <strings>
+      <variables />
+      <selection>0</selection>
+    </strings>
+  </globals>
+</DialogueEditorData>

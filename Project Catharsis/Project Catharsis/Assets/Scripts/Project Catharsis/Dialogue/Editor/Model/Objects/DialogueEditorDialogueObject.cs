@@ -7,7 +7,7 @@ namespace Catharsis.DialogueEditor.Model.Objects
     public class DialogueEditorDialogueObject
     {
         public int id;
-        public string name;
+        public string dialogueName;
         public int? startPage;
         public Vector2 scrollPosition;
         public List<DialogueEditorNodeObject> nodes;
@@ -17,7 +17,7 @@ namespace Catharsis.DialogueEditor.Model.Objects
 
         public DialogueEditorDialogueObject()
         {
-            name = "New Dialogue";
+            dialogueName = "New Dialogue";
             nodes = new List<DialogueEditorNodeObject>();
             floats = new DialogueEditorVariablesContainer();
             strings = new DialogueEditorVariablesContainer();

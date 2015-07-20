@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.ProjectWindowCallback;
@@ -25,9 +26,9 @@ namespace ScriptableObjectFactory
         private int selectedIndex;
         private string[] names;
 
-        private Type[] types;
+        private List<Type> types;
 
-        public Type[] Types
+        public List<Type> Types
         {
             get { return types; }
             set
@@ -41,7 +42,6 @@ namespace ScriptableObjectFactory
         {
             GUILayout.Label("ScriptableObject Class");
             selectedIndex = EditorGUILayout.Popup(selectedIndex, names);
-
             if (GUILayout.Button("Create"))
             {
                 var asset = ScriptableObject.CreateInstance(types[selectedIndex]);

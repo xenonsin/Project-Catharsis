@@ -3,13 +3,13 @@
     [System.Serializable]
     public class DialogueEditorVariableObject
     {
-        public string name;
+        public string variableName;
         public string variable;
         public int id;
 
         public DialogueEditorVariableObject()
         {
-            name = string.Empty;
+            variableName = string.Empty;
             variable = string.Empty;
         }
     }

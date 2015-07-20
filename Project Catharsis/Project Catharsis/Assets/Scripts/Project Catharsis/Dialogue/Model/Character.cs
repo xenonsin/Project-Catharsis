@@ -8,30 +8,31 @@ namespace Catharsis.DialogueEditor.Model
     [System.Serializable]
     public class Character : ScriptableObject
     {
-        public string name;
+        public string characterName;
 
         /// <summary>
         /// The Character Icon, or main portrait if only using one image.
         /// </summary>
         public Sprite portrait2D;
 
-        public GameObject portrait3D;
+        //public GameObject portrait3D;
 
         public Color nameColor;
 
+
         public Character()
         {
-            name = "< Name >";
+            characterName = "< Name >";
             portrait2D = Resources.Load("defaultPortait") as Sprite;
-            portrait3D = Resources.Load("defaultGameObject") as GameObject;
+            //portrait3D = Resources.Load("defaultGameObject") as GameObject;
             nameColor = Color.yellow;
         }
 
         public Character(string name, Sprite portrait2D, GameObject portrait3D)
         {
-            this.name = name;
+            this.characterName = name;
             this.portrait2D = portrait2D;
-            this.portrait3D = portrait3D;
+            //this.portrait3D = portrait3D;
         }
 
         //TODO: Add a list of animations and be able to play them.?

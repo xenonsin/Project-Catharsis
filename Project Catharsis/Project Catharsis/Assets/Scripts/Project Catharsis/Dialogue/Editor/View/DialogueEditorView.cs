@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Catharsis.DialogueEditor.Config;
 using Catharsis.DialogueEditor.Model;
 using Catharsis.DialogueEditor.Model.Objects;
 using Catharsis.DialogueEditor.Model.VariableEditor;
@@ -14,7 +15,7 @@ namespace Catharsis.DialogueEditor
         #region Menu Options
         public enum FileMenuOptions
         {
-            SaveScenario = 0, SaveScenarioAs, LoadScenario, NewDialogue, AddMessageNode, AddBranchingMessageNode, AddConditionalNode, AddSetVariableNode, AddGenericEventNode, AddEndNode,
+            SaveScenario = 0, SaveScenarioAs, NewScenario, LoadScenario, NewDialogue, AddMessageNode, AddBranchingMessageNode, AddConditionalNode, AddSetVariableNode, AddGenericEventNode, AddEndNode,
         }
 
         public enum EditMenuOptions
@@ -49,9 +50,12 @@ namespace Catharsis.DialogueEditor
         [SerializeField] private Texture _bgTexture;
 
         private bool loaded = false;
+        private bool newScenario = true;
 
         [SerializeField]
         private Dictionary<int, DialogueEditorNodeType> _nodeTypes;
+
+        [SerializeField] private DialogueEditorSettings _settings;
 
         // Dragging vars
         private Vector2 _panningMousePosition;
@@ -96,9 +100,15 @@ namespace Catharsis.DialogueEditor
             InitNodeTypes();
             if (_dialogueData == null)
             {
-                Debug.Log("Loading last scenario: " + currentScenario);
-                _dialogueData = new DialogueEditorDataManager();
-                //LoadScenario(lastScenario);
+                //_dialogueData = new DialogueEditorDataManager();
+
+                LoadSettings();
+                New();
+                if(_settings.lastScenarioName != string.Empty)
+                    LoadScenario(_settings.lastScenarioName);
+
+
+                loaded = true;
             }
             //Init();
         }
@@ -119,7 +129,7 @@ namespace Catharsis.DialogueEditor
             if (_bgTexture == null)
                 LoadBgTexture();
 
-            loaded = true;
+
         }
 
         private void InitNodeTypes()
@@ -148,6 +158,19 @@ namespace Catharsis.DialogueEditor
             DisplayToolBar();
         }
 
+        private void LoadSettings()
+        {
+            _settings = Resources.Load("DialogueEditorSettings") as DialogueEditorSettings;
+
+            //currentScenario = _settings.lastScenarioName;
+        }
+
+        private void New()
+        {
+            _dialogueData = new DialogueEditorDataManager();
+            newScenario = true;
+        }
+
         private void LoadScenario(string nameOfScenario)
         {
             bool assetExists = System.IO.File.Exists(nameOfScenario);
@@ -159,6 +182,8 @@ namespace Catharsis.DialogueEditor
             {
                 Debug.LogWarning("name of Asset doesn't exist!");
             }
+
+            newScenario = false;
         }
 
         private void LoadScenario()
@@ -170,16 +195,31 @@ namespace Catharsis.DialogueEditor
 
             Repaint();
 
-            currentScenario = file;
+            _settings.lastScenarioName = file;
+
+            newScenario = false;
         }
         private void Save()
         {
-            //NEED TO CHECK IF LOADED.
+            if (newScenario)
+                SaveAs();
+            else
+                _dialogueData.Save(_settings.lastScenarioName);
+
+            newScenario = false;
         }
 
         private void SaveAs()
         {
-            
+            string file = EditorUtility.SaveFilePanel("Export input profile", "", "newScenario.xml", "xml");
+            if (string.IsNullOrEmpty(file))
+                return;
+
+            _dialogueData.Save(file);
+
+            newScenario = false;
+            _settings.lastScenarioName = file;
+
         }
 
 
@@ -220,9 +260,9 @@ namespace Catharsis.DialogueEditor
 
             if (currentDialogue < _dialogueData.data.DialogueCount && currentDialogue >= 0)
             {
-                _dialogueData.data.dialogues[currentDialogue].name = GUI.TextField(nameRect, _dialogueData.data.dialogues[currentDialogue].name, nameTextStyle);
+                _dialogueData.data.dialogues[currentDialogue].dialogueName = GUI.TextField(nameRect, _dialogueData.data.dialogues[currentDialogue].dialogueName, nameTextStyle);
                 GUI.color = new Color(1, 1, 1, 0.25f);
-                if (_dialogueData.data.dialogues[currentDialogue].name == "") 
+                if (_dialogueData.data.dialogues[currentDialogue].dialogueName == "") 
                     GUI.Label(nameRect, "Dialogue Name", nameTextStyle);
             }
 
@@ -524,7 +564,7 @@ namespace Catharsis.DialogueEditor
             {
 
 
-                DisplayHierarchyDialogueItem(screenRect, i, _dialogueData.data.dialogues[i].name);
+                DisplayHierarchyDialogueItem(screenRect, i, _dialogueData.data.dialogues[i].dialogueName);
 
             }
             
@@ -576,7 +616,7 @@ namespace Catharsis.DialogueEditor
             Rect labelNameRow = new Rect(labelNumberRow.x + 25, labelNumberRow.y, labelNumberRow.width - 25, labelNumberRow.height);
 
             GUI.Label(labelNumberRow, _dialogueData.data.dialogues[index].id.ToString());
-            GUI.Label(labelNameRow, (_dialogueData.data.dialogues[index].name == string.Empty) ? "-" : _dialogueData.data.dialogues[index].name);
+            GUI.Label(labelNameRow, (_dialogueData.data.dialogues[index].dialogueName == string.Empty) ? "-" : _dialogueData.data.dialogues[index].dialogueName);
 
             Repaint();
            
@@ -619,7 +659,13 @@ namespace Catharsis.DialogueEditor
         private void CreateFileMenu(Rect rect)
         {
             GenericMenu fileMenu = new GenericMenu();
+
+            fileMenu.AddItem(new GUIContent("New Scenario"), false, HandleFileMenuOption, FileMenuOptions.NewScenario);
+            
+            fileMenu.AddSeparator("");
             fileMenu.AddItem(new GUIContent("Save Scenario"), false, HandleFileMenuOption, FileMenuOptions.SaveScenario);
+            fileMenu.AddItem(new GUIContent("Save Scenario As..."), false, HandleFileMenuOption, FileMenuOptions.SaveScenarioAs);
+
             fileMenu.AddItem(new GUIContent("Load Scenario"), false, HandleFileMenuOption, FileMenuOptions.LoadScenario);
 
             fileMenu.AddSeparator("");
@@ -660,8 +706,14 @@ namespace Catharsis.DialogueEditor
             FileMenuOptions option = (FileMenuOptions)arg;
             switch (option)
             {
+                case FileMenuOptions.NewScenario:
+                    New();
+                    break;
                 case FileMenuOptions.SaveScenario:
-
+                    Save();
+                    break;
+                case FileMenuOptions.SaveScenarioAs:
+                    SaveAs();
                     break;
                 case FileMenuOptions.LoadScenario:
                     LoadScenario();
@@ -869,7 +921,7 @@ namespace Catharsis.DialogueEditor
 
         private void GetNodeScrollLimits()
         {
-            if (_dialogueData.data.dialogues.Count < 1) return;
+            if (_dialogueData.data == null || _dialogueData.data.dialogues.Count < 1) return;
 
             int padding = 500;
             DialogueEditorDialogueObject dialogue = _dialogueData.data.dialogues[currentDialogue];
@@ -1196,7 +1248,7 @@ namespace Catharsis.DialogueEditor
                 Rect labelNumberRow = new Rect(row.x + 2, row.y + 2, row.width - 4, row.height - 4);
                 Rect labelNameRow = new Rect(labelNumberRow.x + 25, labelNumberRow.y, labelNumberRow.width - 25, labelNumberRow.height);
                 GUI.Label(labelNumberRow, variables.variables[i].id.ToString());
-                string labelNameText = (variables.variables[i].name != string.Empty) ? variables.variables[i].name : string.Empty;
+                string labelNameText = (variables.variables[i].variableName != string.Empty) ? variables.variables[i].variableName : string.Empty;
                 GUI.Label(labelNameRow, labelNameText);
                 GUI.color = new Color(1, 1, 1, 0.5f);
                 GUI.Label(labelNameRow, (variables.variables[i].variable != string.Empty) ? labelNameText + ": " + variables.variables[i].variable : string.Empty);

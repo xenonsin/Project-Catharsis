@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Xml.Serialization;
 using UnityEditor;
+using UnityEngine;
 
 namespace Catharsis.DialogueEditor.Model
 {
@@ -15,7 +16,8 @@ namespace Catharsis.DialogueEditor.Model
 
         public void Save(string file)
         {
-            AssetDatabase.DeleteAsset(file);
+            if (file.StartsWith(Application.dataPath))
+                AssetDatabase.DeleteAsset(file);
             XmlSerializer serializer = new XmlSerializer(typeof(DialogueEditorData));
             TextWriter textWriter = new StreamWriter(file);
             serializer.Serialize(textWriter, data);
