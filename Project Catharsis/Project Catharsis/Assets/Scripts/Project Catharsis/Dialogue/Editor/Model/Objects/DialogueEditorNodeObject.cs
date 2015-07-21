@@ -20,11 +20,13 @@ namespace Catharsis.DialogueEditor.Model.Objects
         //Message Node Vars
         public string text;
         public Character character;
+        public int animSelectId;
+        public string animName;
         public AudioClip audio;
         public Rect rect;
         public bool waitForResponse;
         public DialogueEditorWaitTypes waitType;
-        public float? waitDuration;
+        public float waitDuration;
 
         //Branching Message Node Var
         public List<string> choices;
@@ -186,10 +188,12 @@ namespace Catharsis.DialogueEditor.Model.Objects
             node.metadata = string.Empty;
 
             node.character = null;
+            node.animSelectId = 0;
+            node.animName = string.Empty;
             node.audio = null;
             node.rect = new Rect(0,0,0,0);
             node.waitForResponse = true;
-            node.waitDuration = null;
+            node.waitDuration = 0;
 
             node.outs = new List<int?>();
             node.outs.Add(null);
@@ -209,10 +213,12 @@ namespace Catharsis.DialogueEditor.Model.Objects
             node.metadata = string.Empty;
 
             node.character = null;
+            node.animSelectId = 0;
+            node.animName = string.Empty;
             node.audio = null;
             node.rect = new Rect(0, 0, 0, 0);
             node.waitForResponse = true;
-            node.waitDuration = null;
+            node.waitDuration = 0;
 
             node.outs = new List<int?>();
             node.outs.Add(null);

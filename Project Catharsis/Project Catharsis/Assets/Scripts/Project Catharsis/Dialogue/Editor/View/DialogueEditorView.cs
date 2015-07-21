@@ -1284,18 +1284,18 @@ namespace Catharsis.DialogueEditor
                 Rect separatorBox = new Rect(baseRect.x, baseRect.y + 2, baseRect.width, 298);
 
                 GUI.Box(separatorBox, string.Empty);
-                
 
-                Rect titleBox = new Rect(baseRect.x + 5, baseRect.y + 8, baseRect.width - 10, 24);
 
-                GUI.Box(titleBox, string.Empty);
-                
-                GUI.Label(new Rect(titleBox.x + 4, titleBox.y + 4, titleBox.width - 10, 20), "Advanced");
-
-                Rect varBox = new Rect(baseRect.x + 5, titleBox.yMax + 5, baseRect.width - 10 - 210 - 5, 26);
+                Rect varBox = new Rect(baseRect.x + 5, baseRect.y + 8, baseRect.width - 10 - 210 - 5, 26);
 
                 GUI.Box(varBox, string.Empty);
                 
+                //GUI.Label(new Rect(titleBox.x + 4, titleBox.y + 4, titleBox.width - 10, 20), "Advanced");
+
+                Rect themeBox = new Rect(baseRect.x + 5, varBox.yMax + 5, baseRect.width - 10, 26);
+
+                GUI.Box(themeBox, string.Empty);
+
                 GUI.Label(new Rect(varBox.x + 6, varBox.y + 5, varBox.width - 10, 20), "Variables");
                 Rect globalVariableStringsRect = new Rect(varBox.xMax + 5, varBox.y + 3, 210, varBox.height - 6);
                 if (GUI.Button(new Rect(globalVariableStringsRect.x + ((globalVariableStringsRect.width / 3) * 0), globalVariableStringsRect.y, globalVariableStringsRect.width / 3, globalVariableStringsRect.height), "Boolean")) { node.text += "<" + NodeVarSubStrings.GLOBAL + NodeVarSubStrings.BOOLEAN + ">" + "0" + "</" + NodeVarSubStrings.GLOBAL + NodeVarSubStrings.BOOLEAN + ">"; }
@@ -1318,10 +1318,10 @@ namespace Catharsis.DialogueEditor
                 phase.newWindow = GUI.Toggle(newWindowToggleRect, phase.newWindow, "New Window");
                 */
 
-                Rect themeBox = new Rect(baseRect.x + 5, varBox.yMax + 5, baseRect.width - 10, 26);
+                Rect characterBox = new Rect(baseRect.x + 5, themeBox.yMax + 5, baseRect.width - 10, 26);
 
-                GUI.Box(themeBox, string.Empty);
-                
+                GUI.Box(characterBox, string.Empty);
+
                 GUI.Label(new Rect(themeBox.x + 4, themeBox.y + 5, 100, 20), "Theme:");
                 Rect themeTextFieldRect = new Rect(themeBox.x + 65, themeBox.y + 5, themeBox.width - 65 - 5, themeBox.height - 10);
 
@@ -1334,17 +1334,37 @@ namespace Catharsis.DialogueEditor
                 //node.newWindow = GUI.Toggle(newWindowToggleRect, node.newWindow, "New Window");
 
 
-                Rect nameRect = new Rect(themeBox.x, themeBox.yMax + 5, themeBox.width, 26);
-
-                GUI.Box(nameRect, string.Empty);
+               
                 
                 //GUI.Label(new Rect(nameRect.x + 4, nameRect.y + 5, 100, 20), "Name:");
-                Rect nameTextFieldRect = new Rect(nameRect.x + 4, nameRect.y + 5, nameRect.width - 5, nameRect.height - 10);
+                Rect nameTextFieldRect = new Rect(characterBox.x + 4, characterBox.y + 5, characterBox.width - 5, characterBox.height - 10);
+
+                if (node.character != null)
+                {
+                    //TODO:could probably get an error because of the path.
+                    if (node.character.name != string.Empty)
+                        node.character = Resources.Load(node.character.name) as Character;
+                }
+               // if (node.character.Portrait3D == null && node.character.characterName != string.Empty)
+                   // node.character = Resources.Load(node.character.characterName) as Character;
 
                 node.character = EditorGUI.ObjectField(nameTextFieldRect, "Character:", node.character, typeof(Character), false) as Character;
+                Rect animBox = new Rect(characterBox.x, characterBox.yMax + 5, characterBox.width, 26);
+                Rect animFieldRect = new Rect(animBox.x + 4, animBox.y + 5, animBox.width -5, animBox.height - 10);
+                GUI.Box(animBox, string.Empty);
+                if (node.character != null)
+                {
+                    node.animSelectId = EditorGUI.IntPopup(animFieldRect, "Animation:", node.animSelectId, node.character.animationNames, node.character.animIndex);
+                }
+                else
+                {
+                    GUI.Label(new Rect( animBox.x + 4, animBox.y +5,animBox.width-5, 20), "Animation:                      Select a Character");
+                }
+                
+                
+                
 
-
-                Rect audioRect = new Rect(nameRect.x, nameRect.yMax + 5, nameRect.width, 26);
+                Rect audioRect = new Rect(animBox.x, animBox.yMax + 5, animBox.width, 26);
 
                 GUI.Box(audioRect, string.Empty);
                 
@@ -1373,10 +1393,47 @@ namespace Catharsis.DialogueEditor
                 Rect waitRect = new Rect(metadataRect.x, metadataRect.yMax + 5, metadataRect.width, 48);
 
                 GUI.Box(waitRect, string.Empty);
+
+                Rect newWindowToggleRect = new Rect(waitRect.x + 4, waitRect.y + 5, 130, 26);
+                node.waitForResponse = GUI.Toggle(newWindowToggleRect, node.waitForResponse, "Wait For Response");
+                Rect waitTextFieldRect = new Rect(waitRect.xMax - 65, waitRect.y + 5, waitRect.width - 65 - 5 - 160, 16);
+
+                Rect contentRect = new Rect(waitRect.x + 5, newWindowToggleRect.yMax - 7, waitRect.width - 10, 16);
+
+
+                Rect secondsRect = new Rect(contentRect.x, contentRect.y, contentRect.width * 0.3333f, 20);
+                Rect framesRect = new Rect(contentRect.x + (contentRect.width * 0.3333f), contentRect.y, contentRect.width * 0.3333f, 20);
+                Rect onContinueRect = new Rect(contentRect.x + ((contentRect.width * 0.3333f) * 2), contentRect.y, contentRect.width * 0.3333f, 20);
+
+                if (node.waitForResponse == true)
+                {
+                    GUI.color = new Color(1, 1, 1, 0.25f);
+                    GUI.Label(new Rect(waitRect.xMax - 110, waitRect.y + 5, 100, 20), "Wait:");
+                    GUI.Box(waitTextFieldRect, string.Empty);
+                    GUI.Label(new Rect(waitTextFieldRect.x + 1, waitTextFieldRect.y, waitTextFieldRect.width, waitTextFieldRect.height), node.waitDuration.ToString());
+
+                    if (GUI.Toggle(secondsRect, false, "Seconds", new GUIStyle(EditorStyles.miniButtonLeft))) { }
+
+                    if (GUI.Toggle(framesRect, false, "Frames", new GUIStyle(EditorStyles.miniButtonMid))) { }
+
+                    if (GUI.Toggle(onContinueRect, false, "Continue", new GUIStyle(EditorStyles.miniButtonRight))) { }
+
+                    GUI.color = GUI.contentColor;
+                }
+                else
+                {
+                    GUI.Label(new Rect(waitRect.xMax - 110, waitRect.y + 5, 100, 20), "Wait:");
+                    
+                    node.waitDuration = EditorGUI.FloatField(waitTextFieldRect, node.waitDuration);
+                    if (GUI.Toggle(secondsRect, (node.waitType == DialogueEditorWaitTypes.Seconds), "Seconds", new GUIStyle(EditorStyles.miniButtonLeft))) { node.waitType = DialogueEditorWaitTypes.Seconds; }
+
+                    if (GUI.Toggle(framesRect, (node.waitType == DialogueEditorWaitTypes.Frames), "Frames", new GUIStyle(EditorStyles.miniButtonMid))) { node.waitType = DialogueEditorWaitTypes.Frames; }
+
+                    if (GUI.Toggle(onContinueRect, (node.waitType == DialogueEditorWaitTypes.Continue), "Continue", new GUIStyle(EditorStyles.miniButtonRight))) { node.waitType = DialogueEditorWaitTypes.Continue; }
+
+                }
+
                 
-                GUI.Label(new Rect(waitRect.x + 4, waitRect.y + 5, 100, 20), "Wait:");
-                Rect waitTextFieldRect = new Rect(waitRect.x + 65, waitRect.y + 5, waitRect.width - 65 - 5, 16);
-                GUI.Box(waitTextFieldRect, string.Empty);
                 
                 // FIX THIS SHIT
                 //phase.audio = EditorGUI.ObjectField(audioFileFieldRect, phase.audio, typeof(AudioClip), false) as AudioClip;

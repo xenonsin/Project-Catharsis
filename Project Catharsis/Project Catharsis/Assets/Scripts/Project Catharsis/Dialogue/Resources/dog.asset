@@ -9,12 +9,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7ed2c208f974ca74bbc1b30ec9922299, type: 3}
-  m_Name: defaultCharacter
+  m_Name: dog
   m_EditorClassIdentifier: 
-  characterName: dig
-  portrait2D: {fileID: 21300000, guid: c81a97ab1c05fd44fb56626049139280, type: 3}
+  characterName: Dog
+  portrait2D: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
   portrait3D: {fileID: 186510, guid: c58191a5a4c41b740b23915e6cb5c33d, type: 2}
-  portrait2Dname: defaultPortrait
+  portrait2Dname: Checkmark
   portrait3Dname: defaultGameObject
   animIndex: 0000000001000000
   animationNames:
