@@ -8,6 +8,9 @@ using UnityEngine;
 
 namespace Catharsis.DialogueEditor.Model
 {
+    //Currently having warning that this must be instantated using the ScriptioableObject.CreateInstance instead of new Character
+    //The new Character is being called by the serializer.. it creates a new Character every time it loads.. but it cant.
+    
     //TODO: Add editor extension so that you can add characters
     //TODO: Allow the Dialogue Editor to choose the animation when using the gameobject
     [System.Serializable]

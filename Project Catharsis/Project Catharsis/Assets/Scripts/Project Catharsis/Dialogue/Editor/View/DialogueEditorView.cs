@@ -184,6 +184,7 @@ namespace Catharsis.DialogueEditor
             }
 
             newScenario = false;
+            GetNodeScrollLimits();
         }
 
         private void LoadScenario()
@@ -198,6 +199,7 @@ namespace Catharsis.DialogueEditor
             _settings.lastScenarioName = file;
 
             newScenario = false;
+            GetNodeScrollLimits();
         }
         private void Save()
         {
@@ -1339,22 +1341,21 @@ namespace Catharsis.DialogueEditor
                 //GUI.Label(new Rect(nameRect.x + 4, nameRect.y + 5, 100, 20), "Name:");
                 Rect nameTextFieldRect = new Rect(characterBox.x + 4, characterBox.y + 5, characterBox.width - 5, characterBox.height - 10);
 
-                if (node.character != null)
-                {
+                
                     //TODO:could probably get an error because of the path.
-                    if (node.character.name != string.Empty)
-                        node.character = Resources.Load(node.character.name) as Character;
-                }
+                if (node.characterName != string.Empty)
+                    node.Character = Resources.Load(node.characterName) as Character;
+                
                // if (node.character.Portrait3D == null && node.character.characterName != string.Empty)
                    // node.character = Resources.Load(node.character.characterName) as Character;
 
-                node.character = EditorGUI.ObjectField(nameTextFieldRect, "Character:", node.character, typeof(Character), false) as Character;
+                node.Character = EditorGUI.ObjectField(nameTextFieldRect, "Character:", node.Character, typeof(Character), false) as Character;
                 Rect animBox = new Rect(characterBox.x, characterBox.yMax + 5, characterBox.width, 26);
                 Rect animFieldRect = new Rect(animBox.x + 4, animBox.y + 5, animBox.width -5, animBox.height - 10);
                 GUI.Box(animBox, string.Empty);
-                if (node.character != null)
+                if (node.Character != null)
                 {
-                    node.animSelectId = EditorGUI.IntPopup(animFieldRect, "Animation:", node.animSelectId, node.character.animationNames, node.character.animIndex);
+                    node.animSelectId = EditorGUI.IntPopup(animFieldRect, "Animation:", node.animSelectId, node.Character.animationNames, node.Character.animIndex);
                 }
                 else
                 {
@@ -1370,8 +1371,10 @@ namespace Catharsis.DialogueEditor
                 
                 //GUI.Label(new Rect(portraitRect.x + 4, portraitRect.y + 5, 100, 20), "Portrait:");
                 Rect audioTextFieldRect = new Rect(audioRect.x + 4, audioRect.y + 5, audioRect.width - 5, audioRect.height - 10);
+                if (node.audioName != string.Empty)
+                    node.Audio = Resources.Load(node.audioName) as AudioClip;
 
-                node.audio = EditorGUI.ObjectField(audioTextFieldRect, "Audio:", node.audio, typeof(AudioClip), false) as AudioClip;
+                node.Audio = EditorGUI.ObjectField(audioTextFieldRect, "Audio:", node.Audio, typeof(AudioClip), false) as AudioClip;
                 //GUI.Box(portraitTextFieldRect, string.Empty);
 
                 //TODO: Display the picture!

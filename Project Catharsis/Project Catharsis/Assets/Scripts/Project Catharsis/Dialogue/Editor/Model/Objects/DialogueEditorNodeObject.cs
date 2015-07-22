@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Net;
+using System.Xml.Serialization;
 using Catharsis.DialogueEditor.Model.VariableEditor;
 using UnityEngine;
 
@@ -19,10 +21,37 @@ namespace Catharsis.DialogueEditor.Model.Objects
 
         //Message Node Vars
         public string text;
-        public Character character;
+        public string characterName;
+
+        private Character _character;
+
+        [XmlIgnore]
+        public Character Character
+        {
+            get { return _character;}
+            set
+            {
+                _character = value;
+                characterName = value ? value.name : string.Empty;
+            }
+        }
         public int animSelectId;
         public string animName;
-        public AudioClip audio;
+
+        public string audioName;
+        private AudioClip _audio;
+        [XmlIgnore]
+        public AudioClip Audio
+        {
+            get { return _audio;}
+            set
+            {
+                _audio = value;
+                
+                audioName = value ? value.name : string.Empty;
+            }
+        }
+
         public Rect rect;
         public bool waitForResponse;
         public DialogueEditorWaitTypes waitType;
@@ -187,10 +216,10 @@ namespace Catharsis.DialogueEditor.Model.Objects
             node.advanced = false;
             node.metadata = string.Empty;
 
-            node.character = null;
+            node.Character = null;
             node.animSelectId = 0;
             node.animName = string.Empty;
-            node.audio = null;
+            node.Audio = null;
             node.rect = new Rect(0,0,0,0);
             node.waitForResponse = true;
             node.waitDuration = 0;
@@ -212,10 +241,10 @@ namespace Catharsis.DialogueEditor.Model.Objects
             node.advanced = false;
             node.metadata = string.Empty;
 
-            node.character = null;
+            node.Character = null;
             node.animSelectId = 0;
             node.animName = string.Empty;
-            node.audio = null;
+            node.Audio = null;
             node.rect = new Rect(0, 0, 0, 0);
             node.waitForResponse = true;
             node.waitDuration = 0;

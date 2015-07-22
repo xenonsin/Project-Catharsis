@@ -7,8 +7,8 @@
       <dialogueName>Tabachoi</dialogueName>
       <startPage>0</startPage>
       <scrollPosition>
-        <x>78.20241</x>
-        <y>0</y>
+        <x>346.016846</x>
+        <y>15.4000015</y>
       </scrollPosition>
       <nodes>
         <DialogueEditorNodeObject>
@@ -25,23 +25,10 @@
           <advanced>true</advanced>
           <metadata />
           <text />
-          <character>
-            <name>defaultCharacter</name>
-            <hideFlags>None</hideFlags>
-            <characterName>dig</characterName>
-            <portrait2Dname>defaultPortrait</portrait2Dname>
-            <portrait3Dname>defaultGameObject</portrait3Dname>
-            <animIndex>
-              <int>0</int>
-              <int>1</int>
-            </animIndex>
-            <animationNames>
-              <string>happy</string>
-              <string>sad</string>
-            </animationNames>
-          </character>
-          <animSelectId>1</animSelectId>
+          <characterName>defaultCharacter</characterName>
+          <animSelectId>0</animSelectId>
           <animName />
+          <audioName />
           <rect>
             <x>0</x>
             <y>0</y>
@@ -100,23 +87,10 @@
           <advanced>true</advanced>
           <metadata />
           <text />
-          <character>
-            <name>defaultCharacter</name>
-            <hideFlags>None</hideFlags>
-            <characterName>dig</characterName>
-            <portrait2Dname>defaultPortrait</portrait2Dname>
-            <portrait3Dname>defaultGameObject</portrait3Dname>
-            <animIndex>
-              <int>0</int>
-              <int>1</int>
-            </animIndex>
-            <animationNames>
-              <string>happy</string>
-              <string>sad</string>
-            </animationNames>
-          </character>
-          <animSelectId>0</animSelectId>
+          <characterName>dog</characterName>
+          <animSelectId>1</animSelectId>
           <animName />
+          <audioName />
           <rect>
             <x>0</x>
             <y>0</y>
@@ -166,8 +140,8 @@
           <type>BranchingMessageNode</type>
           <theme />
           <position>
-            <x>919</x>
-            <y>158</y>
+            <x>921</x>
+            <y>128</y>
           </position>
           <outs>
             <int>3</int>
@@ -176,23 +150,10 @@
           <advanced>true</advanced>
           <metadata />
           <text />
-          <character>
-            <name>defaultCharacter</name>
-            <hideFlags>None</hideFlags>
-            <characterName>dig</characterName>
-            <portrait2Dname>defaultPortrait</portrait2Dname>
-            <portrait3Dname>defaultGameObject</portrait3Dname>
-            <animIndex>
-              <int>0</int>
-              <int>1</int>
-            </animIndex>
-            <animationNames>
-              <string>happy</string>
-              <string>sad</string>
-            </animationNames>
-          </character>
+          <characterName>defaultCharacter</characterName>
           <animSelectId>0</animSelectId>
           <animName />
+          <audioName />
           <rect>
             <x>0</x>
             <y>0</y>
@@ -314,7 +275,7 @@
       <dialogueName>Dog</dialogueName>
       <startPage>0</startPage>
       <scrollPosition>
-        <x>29.9000053</x>
+        <x>0</x>
         <y>0</y>
       </scrollPosition>
       <nodes>
@@ -332,23 +293,10 @@
           <advanced>true</advanced>
           <metadata />
           <text />
-          <character>
-            <name>dog</name>
-            <hideFlags>None</hideFlags>
-            <characterName>Dog</characterName>
-            <portrait2Dname>Checkmark</portrait2Dname>
-            <portrait3Dname>defaultGameObject</portrait3Dname>
-            <animIndex>
-              <int>0</int>
-              <int>1</int>
-            </animIndex>
-            <animationNames>
-              <string>happy</string>
-              <string>sad</string>
-            </animationNames>
-          </character>
-          <animSelectId>0</animSelectId>
+          <characterName>dog</characterName>
+          <animSelectId>1</animSelectId>
           <animName />
+          <audioName>defaultSfx</audioName>
           <rect>
             <x>0</x>
             <y>0</y>
@@ -407,23 +355,10 @@
           <advanced>true</advanced>
           <metadata />
           <text />
-          <character>
-            <name>dog</name>
-            <hideFlags>None</hideFlags>
-            <characterName>Dog</characterName>
-            <portrait2Dname>Checkmark</portrait2Dname>
-            <portrait3Dname>defaultGameObject</portrait3Dname>
-            <animIndex>
-              <int>0</int>
-              <int>1</int>
-            </animIndex>
-            <animationNames>
-              <string>happy</string>
-              <string>sad</string>
-            </animationNames>
-          </character>
+          <characterName>dog</characterName>
           <animSelectId>0</animSelectId>
           <animName />
+          <audioName />
           <rect>
             <x>0</x>
             <y>0</y>
