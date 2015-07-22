@@ -10,6 +10,13 @@ namespace Catharsis.GlobalVariablesManager.Model
         public Dictionary<string, float> floats;
         public Dictionary<string, string> strings;
 
+        public GlobalVariables()
+        {
+            booleans = new Dictionary<string, bool>();
+            floats = new Dictionary<string, float>();
+            strings = new Dictionary<string, string>();
+        }
+
         public GlobalVariables(Dictionary<string, bool> booleans, Dictionary<string, float> floats, Dictionary<string, string> strings)
         {
             this.booleans = booleans;

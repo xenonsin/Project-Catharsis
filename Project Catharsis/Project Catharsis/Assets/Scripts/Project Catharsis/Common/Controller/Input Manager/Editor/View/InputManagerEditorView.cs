@@ -62,8 +62,8 @@ namespace Catharsis.InputEditor.View
         private float _hierarchyPanelWidth = _menuWidth * 2;
         [SerializeField]
         private Texture2D _highlightTexture;
-        [SerializeField]
-        private string _searchString = "";
+        //[SerializeField]
+       // private string _searchString = "";
         [SerializeField]
         private string _keyString = string.Empty;
 
@@ -95,7 +95,7 @@ namespace Catharsis.InputEditor.View
         private const float _menuWidth = 100.0f;
         private const float _minHierarchyPanelWidth = 150.0f;
 
-        private bool clickingWithMouse = false;
+        //private bool clickingWithMouse = false;
 
         #endregion
 
@@ -109,7 +109,7 @@ namespace Catharsis.InputEditor.View
             window.Show();
         }
 
-        void OnEnable()
+        protected override void OnEnable()
         {
 
             base.OnEnable();
@@ -125,7 +125,7 @@ namespace Catharsis.InputEditor.View
 
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
             base.OnDisable();
             Texture2D.DestroyImmediate(_highlightTexture);

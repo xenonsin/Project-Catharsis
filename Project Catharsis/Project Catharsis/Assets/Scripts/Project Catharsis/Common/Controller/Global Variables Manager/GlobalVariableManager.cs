@@ -28,13 +28,15 @@ namespace Catharsis.GlobalVariablesManager
     {
         private GlobalVariables _data;
 
+        public GlobalVariableManager() { _data = new GlobalVariables();}
+
         //Todo: make command that calls this at gamestart, when the savefile is picked?
         #region Serialization
         public void loadGlobalVariables(string globalVariablesXml)
         {
-            XmlSerializer deserializer = new XmlSerializer(typeof(GlobalVariables));
-            XmlReader xmlReader = XmlReader.Create(new StringReader(globalVariablesXml));
-            GlobalVariables newGlobalVariables = (GlobalVariables) deserializer.Deserialize(xmlReader);
+            //XmlSerializer deserializer = new XmlSerializer(typeof(GlobalVariables));
+           // XmlReader xmlReader = XmlReader.Create(new StringReader(globalVariablesXml));
+            //GlobalVariables newGlobalVariables = (GlobalVariables) deserializer.Deserialize(xmlReader);
 
             //Bools
             //for (int i = 0; i < newGlobalVariables.booleans.Count; i++)

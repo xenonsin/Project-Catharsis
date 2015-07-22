@@ -33,12 +33,12 @@ namespace strange.extensions.editor.impl
 		
 		protected EditorContext context;
 		
-		protected void OnEnable()
+		virtual protected void OnEnable()
 		{
 			EditorContext.RegisterViewWithMatchingContext (this);
 		}
 		
-		protected void OnDisable()
+		virtual protected void OnDisable()
 		{
 			EditorContext.RemoveViewWithMatchingContext (this);
 		}

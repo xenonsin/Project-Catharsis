@@ -12,10 +12,7 @@ MonoBehaviour:
   m_Name: dog
   m_EditorClassIdentifier: 
   characterName: Dog
-  portrait2D: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
-  portrait3D: {fileID: 186510, guid: c58191a5a4c41b740b23915e6cb5c33d, type: 2}
-  portrait2Dname: Checkmark
-  portrait3Dname: defaultGameObject
+  nameColor: {r: .121576242, g: .0754217058, b: .683823526, a: 1}
   animIndex: 0000000001000000
   animationNames:
   - happy

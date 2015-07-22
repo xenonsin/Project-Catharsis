@@ -17,46 +17,31 @@ namespace Catharsis.DialogueEditor.Model
     public class Character : ScriptableObject
     {
         public string characterName;
-
-        [XmlIgnore]
-        [SerializeField]
         private Sprite portrait2D;
-        [XmlIgnore]
+
         public Sprite Portrait2D
         {
             get { return portrait2D;}
             set
             {
                 portrait2D = value;
-                if (value)
-                    portrait2Dname = value.name;
-                else
-                    portrait2Dname = string.Empty;
+
             }
         }
-        [XmlIgnore]
-        [SerializeField]
+
         private GameObject portrait3D;
-        [XmlIgnore]
+
         public GameObject Portrait3D
         {
             get { return portrait3D; }
             set
             {
                 portrait3D = value;
-                if (value)
-                    portrait3Dname = value.name;
-                else
-                    portrait3Dname = string.Empty;
-
                 GetAnimNames();
             }
         }
 
-        private Color nameColor;
-        public string portrait2Dname;
-        public string portrait3Dname;
-        //public Vector3 color;
+        public Color nameColor;
         public int[] animIndex;
         public string[] animationNames;
 

@@ -94,7 +94,7 @@ namespace Catharsis.DialogueEditor
             window.Init();
         }
 
-        void OnEnable()
+        protected override void OnEnable()
         {
             base.OnEnable();
             InitNodeTypes();
@@ -137,7 +137,7 @@ namespace Catharsis.DialogueEditor
             _nodeTypes = DialogueEditorNodeType.GetNodes();
         }
 
-        void OnDisable()
+        protected override void OnDisable()
         {
             base.OnDisable();
             Texture2D.DestroyImmediate(_highlightTexture);
@@ -1342,11 +1342,14 @@ namespace Catharsis.DialogueEditor
                 Rect nameTextFieldRect = new Rect(characterBox.x + 4, characterBox.y + 5, characterBox.width - 5, characterBox.height - 10);
 
                 
-                    //TODO:could probably get an error because of the path.
-                if (node.characterName != string.Empty)
+                //TODO:Only looks for the character in a resources folder.. Not flexible.
+                //When first loading up, we parse the xml file if it contains a character name, then we find the character object
+                //then assign it. This is done because we don't actually serialize the character object, just string reference to it.
+                if (node.characterName != string.Empty && node.Character == null)              
                     node.Character = Resources.Load(node.characterName) as Character;
                 
-               // if (node.character.Portrait3D == null && node.character.characterName != string.Empty)
+
+                // if (node.character.Portrait3D == null && node.character.characterName != string.Empty)
                    // node.character = Resources.Load(node.character.characterName) as Character;
 
                 node.Character = EditorGUI.ObjectField(nameTextFieldRect, "Character:", node.Character, typeof(Character), false) as Character;
@@ -1371,7 +1374,7 @@ namespace Catharsis.DialogueEditor
                 
                 //GUI.Label(new Rect(portraitRect.x + 4, portraitRect.y + 5, 100, 20), "Portrait:");
                 Rect audioTextFieldRect = new Rect(audioRect.x + 4, audioRect.y + 5, audioRect.width - 5, audioRect.height - 10);
-                if (node.audioName != string.Empty)
+                if (node.audioName != string.Empty && node.Audio == null)
                     node.Audio = Resources.Load(node.audioName) as AudioClip;
 
                 node.Audio = EditorGUI.ObjectField(audioTextFieldRect, "Audio:", node.Audio, typeof(AudioClip), false) as AudioClip;

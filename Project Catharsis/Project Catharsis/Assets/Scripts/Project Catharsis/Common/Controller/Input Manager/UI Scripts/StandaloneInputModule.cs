@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿/*
+ * https://bitbucket.org/Unity-Technologies/ui/src/7c219d27562749b5581b017103c6947cebca6536/UnityEngine.UI/EventSystem/InputModules/StandaloneInputModule.cs?at=5.0
+ */
+
+using UnityEngine;
 using UnityEngine.EventSystems;
 #if UNITY_EDITOR
 using UnityEditor;

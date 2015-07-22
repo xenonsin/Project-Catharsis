@@ -10,7 +10,7 @@ namespace Catharsis.InputEditor.Service
         {
             inputConfigurations = new List<InputConfiguration>();
             defaultConfig = string.Empty;
-            var n = SimpleJSON.JSON.Parse(file.text);
+            //var n = SimpleJSON.JSON.Parse(file.text);
 
             //defaultConfig = n["Input"]
         }

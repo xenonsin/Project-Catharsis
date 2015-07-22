@@ -7,8 +7,8 @@
       <dialogueName>Tabachoi</dialogueName>
       <startPage>0</startPage>
       <scrollPosition>
-        <x>346.016846</x>
-        <y>15.4000015</y>
+        <x>255.816467</x>
+        <y>68.2000046</y>
       </scrollPosition>
       <nodes>
         <DialogueEditorNodeObject>
@@ -275,7 +275,7 @@
       <dialogueName>Dog</dialogueName>
       <startPage>0</startPage>
       <scrollPosition>
-        <x>0</x>
+        <x>84.52996</x>
         <y>0</y>
       </scrollPosition>
       <nodes>
@@ -284,8 +284,8 @@
           <type>MessageNode</type>
           <theme />
           <position>
-            <x>206</x>
-            <y>85</y>
+            <x>155</x>
+            <y>83</y>
           </position>
           <outs>
             <int>1</int>
@@ -346,8 +346,8 @@
           <type>MessageNode</type>
           <theme />
           <position>
-            <x>585</x>
-            <y>139</y>
+            <x>558</x>
+            <y>45</y>
           </position>
           <outs>
             <int>2</int>
@@ -356,6 +356,145 @@
           <metadata />
           <text />
           <characterName>dog</characterName>
+          <animSelectId>0</animSelectId>
+          <animName />
+          <audioName />
+          <rect>
+            <x>0</x>
+            <y>0</y>
+            <position>
+              <x>0</x>
+              <y>0</y>
+            </position>
+            <center>
+              <x>0</x>
+              <y>0</y>
+            </center>
+            <min>
+              <x>0</x>
+              <y>0</y>
+            </min>
+            <max>
+              <x>0</x>
+              <y>0</y>
+            </max>
+            <width>0</width>
+            <height>0</height>
+            <size>
+              <x>0</x>
+              <y>0</y>
+            </size>
+            <xMin>0</xMin>
+            <yMin>0</yMin>
+            <xMax>0</xMax>
+            <yMax>0</yMax>
+          </rect>
+          <waitForResponse>false</waitForResponse>
+          <waitType>Seconds</waitType>
+          <waitDuration>2</waitDuration>
+          <choices />
+          <variableScope>Global</variableScope>
+          <variableType>Boolean</variableType>
+          <variableId>0</variableId>
+          <variableScrollPosition>
+            <x>0</x>
+            <y>0</y>
+          </variableScrollPosition>
+          <variableSetEquation>Equals</variableSetEquation>
+          <variableGetEquation>Equals</variableGetEquation>
+        </DialogueEditorNodeObject>
+        <DialogueEditorNodeObject>
+          <id>2</id>
+          <type>EndNode</type>
+          <position>
+            <x>987</x>
+            <y>164</y>
+          </position>
+          <outs />
+          <advanced>false</advanced>
+          <text />
+          <animSelectId>0</animSelectId>
+          <rect>
+            <x>0</x>
+            <y>0</y>
+            <position>
+              <x>0</x>
+              <y>0</y>
+            </position>
+            <center>
+              <x>0</x>
+              <y>0</y>
+            </center>
+            <min>
+              <x>0</x>
+              <y>0</y>
+            </min>
+            <max>
+              <x>0</x>
+              <y>0</y>
+            </max>
+            <width>0</width>
+            <height>0</height>
+            <size>
+              <x>0</x>
+              <y>0</y>
+            </size>
+            <xMin>0</xMin>
+            <yMin>0</yMin>
+            <xMax>0</xMax>
+            <yMax>0</yMax>
+          </rect>
+          <waitForResponse>false</waitForResponse>
+          <waitType>Seconds</waitType>
+          <waitDuration>0</waitDuration>
+          <choices />
+          <variableScope>Global</variableScope>
+          <variableType>Boolean</variableType>
+          <variableId>0</variableId>
+          <variableScrollPosition>
+            <x>0</x>
+            <y>0</y>
+          </variableScrollPosition>
+          <variableSetEquation>Equals</variableSetEquation>
+          <variableGetEquation>Equals</variableGetEquation>
+        </DialogueEditorNodeObject>
+      </nodes>
+      <floats>
+        <variables />
+        <selection>0</selection>
+      </floats>
+      <strings>
+        <variables />
+        <selection>0</selection>
+      </strings>
+      <booleans>
+        <variables />
+        <selection>0</selection>
+      </booleans>
+    </DialogueEditorDialogueObject>
+    <DialogueEditorDialogueObject>
+      <id>2</id>
+      <dialogueName>Milk Man</dialogueName>
+      <startPage>0</startPage>
+      <scrollPosition>
+        <x>0</x>
+        <y>0</y>
+      </scrollPosition>
+      <nodes>
+        <DialogueEditorNodeObject>
+          <id>0</id>
+          <type>MessageNode</type>
+          <position>
+            <x>179</x>
+            <y>129</y>
+          </position>
+          <outs>
+            <int>1</int>
+          </outs>
+          <advanced>false</advanced>
+          <metadata />
+          <text>It's a beautiful sunny day...</text>
+          <characterName />
           <animSelectId>0</animSelectId>
           <animName />
           <audioName />
@@ -404,11 +543,73 @@
           <variableGetEquation>Equals</variableGetEquation>
         </DialogueEditorNodeObject>
         <DialogueEditorNodeObject>
+          <id>1</id>
+          <type>MessageNode</type>
+          <theme />
+          <position>
+            <x>543</x>
+            <y>139</y>
+          </position>
+          <outs>
+            <int>2</int>
+          </outs>
+          <advanced>true</advanced>
+          <metadata />
+          <text>Ruff</text>
+          <characterName>dog</characterName>
+          <animSelectId>0</animSelectId>
+          <animName />
+          <audioName>defaultSfx</audioName>
+          <rect>
+            <x>0</x>
+            <y>0</y>
+            <position>
+              <x>0</x>
+              <y>0</y>
+            </position>
+            <center>
+              <x>0</x>
+              <y>0</y>
+            </center>
+            <min>
+              <x>0</x>
+              <y>0</y>
+            </min>
+            <max>
+              <x>0</x>
+              <y>0</y>
+            </max>
+            <width>0</width>
+            <height>0</height>
+            <size>
+              <x>0</x>
+              <y>0</y>
+            </size>
+            <xMin>0</xMin>
+            <yMin>0</yMin>
+            <xMax>0</xMax>
+            <yMax>0</yMax>
+          </rect>
+          <waitForResponse>true</waitForResponse>
+          <waitType>Seconds</waitType>
+          <waitDuration>0</waitDuration>
+          <choices />
+          <variableScope>Global</variableScope>
+          <variableType>Boolean</variableType>
+          <variableId>0</variableId>
+          <variableScrollPosition>
+            <x>0</x>
+            <y>0</y>
+          </variableScrollPosition>
+          <variableSetEquation>Equals</variableSetEquation>
+          <variableGetEquation>Equals</variableGetEquation>
+        </DialogueEditorNodeObject>
+        <DialogueEditorNodeObject>
           <id>2</id>
           <type>EndNode</type>
           <position>
-            <x>987</x>
-            <y>164</y>
+            <x>925</x>
+            <y>183</y>
           </position>
           <outs />
           <advanced>false</advanced>
