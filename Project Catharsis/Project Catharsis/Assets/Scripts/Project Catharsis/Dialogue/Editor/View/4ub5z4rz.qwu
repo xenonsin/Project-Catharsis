@@ -23,10 +23,6 @@ namespace Catharsis.DialogueEditor
             Duplicate, Delete, DeleteAll, Copy, Paste,
         }
 
-        public enum HierarchyOptions
-        {
-            DialogueSelector,VariableEditor,
-        }
 
 
         #endregion
@@ -41,9 +37,6 @@ namespace Catharsis.DialogueEditor
 
         [SerializeField]
         private Vector2 _hierarchyScrollPos = Vector2.zero;
-
-        [SerializeField] 
-        private Vector2 _variableScrollPos = Vector2.zero;
         [SerializeField]
         private float _hierarchyPanelWidth = _menuWidth * 2;
 
@@ -94,7 +87,6 @@ namespace Catharsis.DialogueEditor
         //For Variable Editor
         private VariableEditorScopes _scope;
         private VariableEditorTypes _type;
-        private HierarchyOptions _options;
          
         [MenuItem("Catharsis/Dialogue Manager/Dialogue Editor", false, 0)]
         public static void OpenWindow()
@@ -165,16 +157,11 @@ namespace Catharsis.DialogueEditor
                 SetTooltip(string.Empty);
 
                 DisplayNodePanel();
-                DisplayEditorChoice();
-                switch (_options)
-                {
-                        case HierarchyOptions.DialogueSelector:
-                            DisplayHierarchyPanel();
-                        break;
-                        case HierarchyOptions.VariableEditor:
-                            DisplayVariableEditor();
-                        break;
-                }
+
+                if (_editingVariable)
+                    DisplayVariableEditor();
+                else
+                    DisplayHierarchyPanel();
 
             }
             DisplayToolBar();
@@ -552,22 +539,7 @@ namespace Catharsis.DialogueEditor
         }
         #endregion
 
-        private void DisplayEditorChoice()
-        {
-            Rect screenRect = new Rect(0.0f, _toolbarHeight + 5.0f, _hierarchyPanelWidth, 30);
-            GUILayout.BeginArea(screenRect);
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Toggle(_options == HierarchyOptions.DialogueSelector, "Dialogues", EditorStyles.miniButtonLeft))
-                _options = HierarchyOptions.DialogueSelector;
-            if (GUILayout.Toggle(_options == HierarchyOptions.VariableEditor, "Variables", EditorStyles.miniButtonRight))
-                _options = HierarchyOptions.VariableEditor;
-
-            GUILayout.EndHorizontal();
-            GUILayout.EndArea();
-        }
-
         #region ViriableEditorPanel
-
 
         void DisplayVariableEditor()
         {
@@ -588,7 +560,7 @@ namespace Catharsis.DialogueEditor
             int currentBooleansCount = (_scope == VariableEditorScopes.Local) ? localBooleansCount : globalBooleansCount;
             int currentStringsCount = (_scope == VariableEditorScopes.Local) ? localStringsCount : globalStringsCount;
 
-            Rect screenRect = new Rect(0.0f, _toolbarHeight + 40.0f, _hierarchyPanelWidth, 160);
+            Rect screenRect = new Rect(0.0f, _toolbarHeight + 5.0f, _hierarchyPanelWidth, position.height - _toolbarHeight + 10.0f);
             string titleText = "Variable: " + _scope.ToString() + " " + _type.ToString();
             //GUI.Box(screenRect, "");
             GUILayout.BeginArea(screenRect);
@@ -621,7 +593,7 @@ namespace Catharsis.DialogueEditor
             else
             {
                 GUI.color = new Color(1, 1, 1, 0.5f);
-                GUILayout.Button("Remove", EditorStyles.miniButtonRight);
+                if (GUILayout.Button("Remove", EditorStyles.miniButtonRight))
                 GUI.color = GUI.contentColor;
             }
 
@@ -629,54 +601,8 @@ namespace Catharsis.DialogueEditor
             GUILayout.EndHorizontal();
 
             DrawEditor();
+
             GUILayout.EndArea();
-
-            Rect scrollRect = new Rect(screenRect.x, screenRect.yMax,screenRect.width,position.height - screenRect.height - 20);
-            GUI.Box(scrollRect, string.Empty);
-           
-            
-            // MOUSE HANDLING
-            int rowHeight = 19;
-
-            Vector2 mouseClickPosition = Vector2.zero;
-            if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && scrollRect.Contains(Event.current.mousePosition))
-            {
-                mouseClickPosition = new Vector2(Event.current.mousePosition.x - scrollRect.x - 3, Event.current.mousePosition.y - scrollRect.y  + _variableScrollPos.y);
-               // Debug.Log(mouseClickPosition);
-
-            }
-            GUILayout.BeginArea(scrollRect);
-            _variableScrollPos = GUILayout.BeginScrollView(_variableScrollPos);
-            for (int i = 0; i < variables.variables.Count; i++)
-            {
-                Rect row = new Rect(0, 0 + ((rowHeight + -1) * i), scrollRect.width, 20);
-                if (mouseClickPosition != Vector2.zero && row.Contains(mouseClickPosition))
-                    variables.selection = i;
-
-                if (variables.selection == i)
-                {
-                    if (_highlightTexture == null)
-                    {
-                        CreateHighlightTexture();
-                    }
-                    GUI.DrawTexture(row, _highlightTexture, ScaleMode.StretchToFill);
-                }
-
-
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(variables.variables[i].id.ToString(), GUILayout.Width(30));
-                string labelNameText = (variables.variables[i].variableName != string.Empty) ? variables.variables[i].variableName : string.Empty;
-                //GUILayout.Label(labelNameText);
-                //GUI.color = new Color(1, 1, 1, 0.5f);
-                GUILayout.Label((variables.variables[i].variable != string.Empty) ? labelNameText + ": " + variables.variables[i].variable : string.Empty);
-                //GUI.color = GUI.contentColor;
-                GUILayout.EndHorizontal();
-            }
-
-            GUILayout.EndScrollView();
-            GUILayout.EndArea();
-
-            Repaint();
         }
 
         private void setTarget(VariableEditorScopes scope, VariableEditorTypes type)
@@ -1113,7 +1039,6 @@ namespace Catharsis.DialogueEditor
             if (GUI.Button(rect, "Save", EditorStyles.toolbarButton))
                 Save();
         }
-
         #endregion
 
 

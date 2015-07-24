@@ -29,8 +29,9 @@ namespace Catharsis.DialogueEditor.Model.Objects
 
         public void removeVariable()
         {
+
             if (variables.Count < 1) return;
-            variables.RemoveAt(variables.Count - 1);
+            variables.RemoveAt(selection);
             if (selection > (variables.Count - 1)) selection = variables.Count - 1;
         }
     }

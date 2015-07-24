@@ -23,10 +23,6 @@ namespace Catharsis.DialogueEditor
             Duplicate, Delete, DeleteAll, Copy, Paste,
         }
 
-        public enum HierarchyOptions
-        {
-            DialogueSelector,VariableEditor,
-        }
 
 
         #endregion
@@ -41,9 +37,6 @@ namespace Catharsis.DialogueEditor
 
         [SerializeField]
         private Vector2 _hierarchyScrollPos = Vector2.zero;
-
-        [SerializeField] 
-        private Vector2 _variableScrollPos = Vector2.zero;
         [SerializeField]
         private float _hierarchyPanelWidth = _menuWidth * 2;
 
@@ -58,7 +51,6 @@ namespace Catharsis.DialogueEditor
 
         private bool loaded = false;
         private bool newScenario = true;
-        private bool _editingVariable = true;
 
         [SerializeField]
         private Dictionary<int, DialogueEditorNodeType> _nodeTypes;
@@ -90,11 +82,6 @@ namespace Catharsis.DialogueEditor
         // Selection Objects
         DialogueEditorSelectionObject _outputSelection;
         DialogueEditorDragNodeObject _dragSelection;
-
-        //For Variable Editor
-        private VariableEditorScopes _scope;
-        private VariableEditorTypes _type;
-        private HierarchyOptions _options;
          
         [MenuItem("Catharsis/Dialogue Manager/Dialogue Editor", false, 0)]
         public static void OpenWindow()
@@ -165,17 +152,8 @@ namespace Catharsis.DialogueEditor
                 SetTooltip(string.Empty);
 
                 DisplayNodePanel();
-                DisplayEditorChoice();
-                switch (_options)
-                {
-                        case HierarchyOptions.DialogueSelector:
-                            DisplayHierarchyPanel();
-                        break;
-                        case HierarchyOptions.VariableEditor:
-                            DisplayVariableEditor();
-                        break;
-                }
-
+                DisplayHierarchyPanel();
+             
             }
             DisplayToolBar();
         }
@@ -190,7 +168,6 @@ namespace Catharsis.DialogueEditor
         private void New()
         {
             _dialogueData = new DialogueEditorDataManager();
-            currentDialogue = 0;
             newScenario = true;
         }
 
@@ -552,271 +529,12 @@ namespace Catharsis.DialogueEditor
         }
         #endregion
 
-        private void DisplayEditorChoice()
-        {
-            Rect screenRect = new Rect(0.0f, _toolbarHeight + 5.0f, _hierarchyPanelWidth, 30);
-            GUILayout.BeginArea(screenRect);
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Toggle(_options == HierarchyOptions.DialogueSelector, "Dialogues", EditorStyles.miniButtonLeft))
-                _options = HierarchyOptions.DialogueSelector;
-            if (GUILayout.Toggle(_options == HierarchyOptions.VariableEditor, "Variables", EditorStyles.miniButtonRight))
-                _options = HierarchyOptions.VariableEditor;
-
-            GUILayout.EndHorizontal();
-            GUILayout.EndArea();
-        }
-
-        #region ViriableEditorPanel
-
-
-        void DisplayVariableEditor()
-        {
-            DialogueEditorVariablesContainer variables = getVariables();
-
-            int globalFloatsCount = _dialogueData.data.globals.floats.variables.Count;
-            int globalBooleansCount = _dialogueData.data.globals.booleans.variables.Count;
-            int globalStringsCount = _dialogueData.data.globals.strings.variables.Count;
-
-            int localFloatsCount = _dialogueData.data.dialogues[currentDialogue].floats.variables.Count;
-            int localBooleansCount = _dialogueData.data.dialogues[currentDialogue].booleans.variables.Count;
-            int localStringsCount = _dialogueData.data.dialogues[currentDialogue].strings.variables.Count;
-
-            int globalVarsCount = globalFloatsCount + globalBooleansCount + globalStringsCount;
-            int localVarsCount = localFloatsCount + localBooleansCount + localStringsCount;
-
-            int currentFloatsCount = (_scope == VariableEditorScopes.Local) ? localFloatsCount : globalFloatsCount;
-            int currentBooleansCount = (_scope == VariableEditorScopes.Local) ? localBooleansCount : globalBooleansCount;
-            int currentStringsCount = (_scope == VariableEditorScopes.Local) ? localStringsCount : globalStringsCount;
-
-            Rect screenRect = new Rect(0.0f, _toolbarHeight + 40.0f, _hierarchyPanelWidth, 160);
-            string titleText = "Variable: " + _scope.ToString() + " " + _type.ToString();
-            //GUI.Box(screenRect, "");
-            GUILayout.BeginArea(screenRect);
-            GUILayout.Label(titleText, EditorStyles.boldLabel);
-
-            GUILayout.BeginHorizontal();           
-            if (GUILayout.Toggle(_scope == VariableEditorScopes.Global, "Globals (" + globalVarsCount + ")", EditorStyles.miniButtonLeft ))
-                setTarget(VariableEditorScopes.Global, _type);
-            if (GUILayout.Toggle(_scope == VariableEditorScopes.Local, "Locals (" + localVarsCount + ")", EditorStyles.miniButtonRight))
-                setTarget(VariableEditorScopes.Local, _type);
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Toggle(_type == VariableEditorTypes.Boolean, "Booleans (" + currentBooleansCount + ")", EditorStyles.miniButtonLeft))
-                setTarget(_scope, VariableEditorTypes.Boolean);
-            if (GUILayout.Toggle(_type == VariableEditorTypes.Float, "Floats (" + currentFloatsCount + ")", EditorStyles.miniButtonMid))
-                setTarget(_scope, VariableEditorTypes.Float);
-            if (GUILayout.Toggle(_type == VariableEditorTypes.String, "Strings (" + currentStringsCount + ")", EditorStyles.miniButtonRight))
-                setTarget(_scope, VariableEditorTypes.String);
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            if(GUILayout.Button("Add", EditorStyles.miniButtonLeft))
-                variables.addVariable();
-            if (variables.variables.Count > 0)
-            {
-                if (GUILayout.Button("Remove", EditorStyles.miniButtonRight))
-                    variables.removeVariable();
-            }
-            else
-            {
-                GUI.color = new Color(1, 1, 1, 0.5f);
-                GUILayout.Button("Remove", EditorStyles.miniButtonRight);
-                GUI.color = GUI.contentColor;
-            }
-
-
-            GUILayout.EndHorizontal();
-
-            DrawEditor();
-            GUILayout.EndArea();
-
-            Rect scrollRect = new Rect(screenRect.x, screenRect.yMax,screenRect.width,position.height - screenRect.height - 20);
-            GUI.Box(scrollRect, string.Empty);
-           
-            
-            // MOUSE HANDLING
-            int rowHeight = 19;
-
-            Vector2 mouseClickPosition = Vector2.zero;
-            if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && scrollRect.Contains(Event.current.mousePosition))
-            {
-                mouseClickPosition = new Vector2(Event.current.mousePosition.x - scrollRect.x - 3, Event.current.mousePosition.y - scrollRect.y  + _variableScrollPos.y);
-               // Debug.Log(mouseClickPosition);
-
-            }
-            GUILayout.BeginArea(scrollRect);
-            _variableScrollPos = GUILayout.BeginScrollView(_variableScrollPos);
-            for (int i = 0; i < variables.variables.Count; i++)
-            {
-                Rect row = new Rect(0, 0 + ((rowHeight + -1) * i), scrollRect.width, 20);
-                if (mouseClickPosition != Vector2.zero && row.Contains(mouseClickPosition))
-                    variables.selection = i;
-
-                if (variables.selection == i)
-                {
-                    if (_highlightTexture == null)
-                    {
-                        CreateHighlightTexture();
-                    }
-                    GUI.DrawTexture(row, _highlightTexture, ScaleMode.StretchToFill);
-                }
-
-
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(variables.variables[i].id.ToString(), GUILayout.Width(30));
-                string labelNameText = (variables.variables[i].variableName != string.Empty) ? variables.variables[i].variableName : string.Empty;
-                //GUILayout.Label(labelNameText);
-                //GUI.color = new Color(1, 1, 1, 0.5f);
-                GUILayout.Label((variables.variables[i].variable != string.Empty) ? labelNameText + ": " + variables.variables[i].variable : string.Empty);
-                //GUI.color = GUI.contentColor;
-                GUILayout.EndHorizontal();
-            }
-
-            GUILayout.EndScrollView();
-            GUILayout.EndArea();
-
-            Repaint();
-        }
-
-        private void setTarget(VariableEditorScopes scope, VariableEditorTypes type)
-        {
-            if (_scope == scope && _type == type) return;
-            getVariables().selection = 0;
-            _scope = scope;
-            _type = type;
-        }
-
-        private void DrawEditor()
-        {
-                DialogueEditorVariablesContainer variables = getVariables();
-		    if(variables.variables.Count < 1){
-			    DrawNoVariablesWarning( _scope, _type);
-		    }else{
-			    switch(_type){
-				    case VariableEditorTypes.Boolean:
-					    DrawBooleanEditor(variables);
-				    break;
-				
-				    case VariableEditorTypes.Float:
-					    DrawFloatEditor(variables);
-				    break;
-				
-				    case VariableEditorTypes.String:
-					    DrawStringEditor(variables);
-				    break;
-			    }
-		    }
-	
-        }
-
-        private DialogueEditorVariablesContainer getVariables()
-        {
-            DialogueEditorVariablesContainer variables;
-
-            if (_scope == VariableEditorScopes.Global)
-            {
-                if (_type == VariableEditorTypes.Float)
-                {
-                    variables = _dialogueData.data.globals.floats;
-                }
-                else if (_type == VariableEditorTypes.String)
-                {
-                    variables = _dialogueData.data.globals.strings;
-                }
-                else
-                {
-                    variables = _dialogueData.data.globals.booleans;
-                }
-            }
-            else
-            {
-                if (_type == VariableEditorTypes.Float)
-                {
-                    variables = _dialogueData.data.dialogues[currentDialogue].floats;
-                }
-                else if (_type == VariableEditorTypes.String)
-                {
-                    variables = _dialogueData.data.dialogues[currentDialogue].strings;
-                }
-                else
-                {
-                    variables = _dialogueData.data.dialogues[currentDialogue].booleans;
-                }
-            }
-
-            return variables;
-        }
-
-
-
-        public void DrawNoVariablesWarning(VariableEditorScopes scope, VariableEditorTypes type)
-        {
-
-            GUIStyle centered = new GUIStyle("label");
-            centered.alignment = TextAnchor.MiddleCenter;
-            GUILayout.Label("\n\nClick 'Add' to create some", centered);
-            centered.fontStyle = FontStyle.Bold;
-            GUILayout.Label("No " + scope.ToString() + " " + type.ToString() + " found.\n\n", centered);
-        }
-        public void DrawBooleanEditor(DialogueEditorVariablesContainer variables)
-        {
-            string targetName = _scope.ToString() + " " + _type.ToString();
-
-
-            GUILayout.Label(targetName + " Name");
-            variables.variables[variables.selection].variableName = GUILayout.TextField(variables.variables[variables.selection].variableName, LargeTextFieldStyle());
-
-            GUILayout.Label(targetName + " Value");
-
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Toggle((variables.variables[variables.selection].variable == "true"), "True", EditorStyles.miniButtonLeft)) variables.variables[variables.selection].variable = "true";
-            if (GUILayout.Toggle((variables.variables[variables.selection].variable != "true"), "False", EditorStyles.miniButtonRight)) variables.variables[variables.selection].variable = "false";
-            GUILayout.EndHorizontal();
-        }
-
-        public void DrawFloatEditor(DialogueEditorVariablesContainer variables)
-        {
-
-            string targetName = _scope.ToString() + " " + _type.ToString();
-
-
-            GUILayout.Label(targetName + " Name");
-            variables.variables[variables.selection].variableName = GUILayout.TextField(variables.variables[variables.selection].variableName, LargeTextFieldStyle());
-
-            GUILayout.Label(targetName + " Value");
-
-            float floatVar;
-            float.TryParse(variables.variables[variables.selection].variable, out floatVar);
-            variables.variables[variables.selection].variable = EditorGUILayout.FloatField(floatVar, LargeTextFieldStyle()).ToString();
-        }
-
-        public void DrawStringEditor(DialogueEditorVariablesContainer variables)
-        {
-            string targetName = _scope.ToString() + " " + _type.ToString();
-
-
-            GUILayout.Label(targetName + " Name");
-            variables.variables[variables.selection].variableName = GUILayout.TextField(variables.variables[variables.selection].variableName, LargeTextFieldStyle());
-
-            GUILayout.Label(targetName + " Value");
-            variables.variables[variables.selection].variable = GUILayout.TextField(variables.variables[variables.selection].variable, LargeTextFieldStyle());
-        }
-
-        private GUIStyle LargeTextFieldStyle()
-        {
-            GUIStyle style = new GUIStyle("textfield");
-            style.fontSize = 16;
-            return style;
-        }
-
-        #endregion
-        #region DialogueSelector
+        #region HierarchyPanel
         void DisplayHierarchyPanel()
         {
-            Rect screenRect = new Rect(0.0f, _toolbarHeight + 20.0f, _hierarchyPanelWidth, position.height - _toolbarHeight + 10.0f);
-            //Rect buttonView = new Rect(screenRect.x, screenRect.y + 20,screenRect.width, position.height - screenRect.y);
-            Rect scrollView = new Rect(screenRect.x, screenRect.y +10.0f, screenRect.width, position.height - screenRect.y );
+            Rect screenRect = new Rect(0.0f, _toolbarHeight - 5.0f, _hierarchyPanelWidth, position.height - _toolbarHeight + 10.0f);
+            Rect scrollView = new Rect(screenRect.x, screenRect.y + 20, screenRect.width, position.height - screenRect.y);
+
             //ADD
             Rect addButtonRect = new Rect(screenRect.x + 5, screenRect.y + 15, (screenRect.width * 0.5f) - 5, 30);
             if (GUI.Button(addButtonRect, "Add", EditorStyles.miniButtonLeft))
@@ -841,7 +559,7 @@ namespace Catharsis.DialogueEditor
             GUILayout.BeginArea(scrollView);
             //GUI.Box(screenRect, "");
             GUI.Box(scrollView, "");
-            GUILayout.Space(48.0f);
+            GUILayout.Space(33.0f);
 
             _hierarchyScrollPos = EditorGUILayout.BeginScrollView(_hierarchyScrollPos);
 
@@ -856,7 +574,7 @@ namespace Catharsis.DialogueEditor
             
             
             EditorGUILayout.EndScrollView();
-            GUILayout.Space(10.0f);
+            GUILayout.Space(20.0f);
             GUILayout.EndArea();
         }
 
@@ -867,7 +585,7 @@ namespace Catharsis.DialogueEditor
             Vector2 mouseClickPosition = Vector2.zero;
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
-                mouseClickPosition = new Vector2(Event.current.mousePosition.x - rect.x - 3, Event.current.mousePosition.y - rect.y + 17 + _hierarchyItemHeight);
+                mouseClickPosition = new Vector2(Event.current.mousePosition.x - rect.x - 3, Event.current.mousePosition.y - rect.y - 3 + _hierarchyItemHeight);
             }
 
             Rect configPos = GUILayoutUtility.GetRect(new GUIContent(name), EditorStyles.label, GUILayout.Height(_hierarchyItemHeight));
@@ -1113,7 +831,6 @@ namespace Catharsis.DialogueEditor
             if (GUI.Button(rect, "Save", EditorStyles.toolbarButton))
                 Save();
         }
-
         #endregion
 
 
