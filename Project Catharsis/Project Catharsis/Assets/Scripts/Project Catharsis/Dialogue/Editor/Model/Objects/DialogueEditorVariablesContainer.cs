@@ -11,19 +11,23 @@ namespace Catharsis.DialogueEditor.Model.Objects
         //Still not sure how this is used.
 
         public List<DialogueEditorVariableObject> variables;
+        public List<int> abandonedIds; 
         public int selection;
 
         public DialogueEditorVariablesContainer()
         {
             selection = 0;
             variables = new List<DialogueEditorVariableObject>();
+            abandonedIds = new List<int>();
         }
 
         public void addVariable()
         {
-            int count = variables.Count;
-            variables.Add(new DialogueEditorVariableObject());
-            variables[count].id = count;
+            DialogueEditorVariableObject newVariableObject = new DialogueEditorVariableObject();
+            newVariableObject.id = GetId();
+
+            variables.Add(newVariableObject);
+
             selection = variables.Count - 1;
         }
 
@@ -31,8 +35,28 @@ namespace Catharsis.DialogueEditor.Model.Objects
         {
 
             if (variables.Count < 1) return;
+            abandonedIds.Add(variables[selection].id);
             variables.RemoveAt(selection);
+
+            abandonedIds.Sort();
+
             if (selection > (variables.Count - 1)) selection = variables.Count - 1;
+        }
+
+        private int GetId()
+        {
+            for (int i = 0; i < abandonedIds.Count; i++)
+            {
+                int id = 0;
+                if (abandonedIds[i] <= variables.Count)
+                {
+                    id = abandonedIds[i];
+                    abandonedIds.RemoveAt(i);
+                    return id;
+                }
+            }
+
+            return variables.Count;
         }
     }
 }

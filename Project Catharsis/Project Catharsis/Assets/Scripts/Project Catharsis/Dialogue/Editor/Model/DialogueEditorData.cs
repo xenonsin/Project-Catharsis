@@ -11,6 +11,7 @@ namespace Catharsis.DialogueEditor.Model
 
         public List<DialogueEditorDialogueObject> dialogues;
         public DialogueEditorGlobalVariablesContainer globals;
+        public List<int> abandonedIds; 
         public int DialogueCount { get { return dialogues.Count; } }
 
         private int _currentDialogueId;
@@ -21,6 +22,7 @@ namespace Catharsis.DialogueEditor.Model
             scenarioName = "newScenario";
             dialogues = new List<DialogueEditorDialogueObject>();
             globals = new DialogueEditorGlobalVariablesContainer();
+            abandonedIds = new List<int>();
         }
 
 
@@ -31,11 +33,12 @@ namespace Catharsis.DialogueEditor.Model
             newCurrentID = 0;
             for (int i = 0; i < newDialogueCount; i += 1)
             {
-                int num = dialogues.Count;
+                DialogueEditorDialogueObject newDialogueObject = new DialogueEditorDialogueObject();
+                newDialogueObject.id = GetID();
                 //Debug.Log ("Adding Entry: "+num);
-                dialogues.Add(new DialogueEditorDialogueObject());
-                dialogues[num].id = num;
-                newCurrentID = dialogues[num].id;
+                dialogues.Add(newDialogueObject);
+
+                newCurrentID = dialogues.Count - 1;
             }
         }
 
@@ -43,8 +46,30 @@ namespace Catharsis.DialogueEditor.Model
         public void RemoveDialogue(int index, out int newCurrentID)
         {
             newCurrentID = (index - 1) < 0 ? 0: (index-1);
+            abandonedIds.Add(dialogues[index].id);
             dialogues.RemoveAt(index);
+            
 
+            abandonedIds.Sort();
+
+        }
+
+        private int GetID()
+        {
+            
+            for (int i = 0; i < abandonedIds.Count; i++)
+            {
+ 
+                int id = 0;
+                if (abandonedIds[i] <= dialogues.Count)
+                {
+                    id = abandonedIds[i];
+                    abandonedIds.RemoveAt(i);
+                    return id;
+                }
+            }
+
+            return dialogues.Count;
         }
     }
 }

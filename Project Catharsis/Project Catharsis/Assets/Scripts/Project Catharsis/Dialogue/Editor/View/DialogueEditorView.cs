@@ -58,8 +58,6 @@ namespace Catharsis.DialogueEditor
 
         private bool loaded = false;
         private bool newScenario = true;
-        private bool _editingVariable = true;
-
         [SerializeField]
         private Dictionary<int, DialogueEditorNodeType> _nodeTypes;
 
@@ -504,8 +502,8 @@ namespace Catharsis.DialogueEditor
             GUI.color = new Color(1, 1, 1, 0.5f);
             Rect countLabelsRect = new Rect(startLabelRect.x, startLabelRect.y + 18, startLabelRect.width, 22);
             GUI.Label(new Rect(countLabelsRect.x, countLabelsRect.y, countLabelsRect.width, countLabelsRect.height), "Local Booleans:	" + _dialogueData.data.dialogues[currentDialogue].booleans.variables.Count);
-            GUI.Label(new Rect(countLabelsRect.x, countLabelsRect.y + 15, countLabelsRect.width, countLabelsRect.height), "Local Floats:		" + _dialogueData.data.dialogues[currentDialogue].floats.variables.Count);
-            GUI.Label(new Rect(countLabelsRect.x, countLabelsRect.y + 30, countLabelsRect.width, countLabelsRect.height), "Local Strings:		" + _dialogueData.data.dialogues[currentDialogue].strings.variables.Count);
+            GUI.Label(new Rect(countLabelsRect.x, countLabelsRect.y + 15, countLabelsRect.width, countLabelsRect.height), "Local Floats:	" + _dialogueData.data.dialogues[currentDialogue].floats.variables.Count);
+            GUI.Label(new Rect(countLabelsRect.x, countLabelsRect.y + 30, countLabelsRect.width, countLabelsRect.height), "Local Strings:	" + _dialogueData.data.dialogues[currentDialogue].strings.variables.Count);
             GUI.color = GUI.contentColor;
         }
 
@@ -588,7 +586,7 @@ namespace Catharsis.DialogueEditor
             int currentBooleansCount = (_scope == VariableEditorScopes.Local) ? localBooleansCount : globalBooleansCount;
             int currentStringsCount = (_scope == VariableEditorScopes.Local) ? localStringsCount : globalStringsCount;
 
-            Rect screenRect = new Rect(0.0f, _toolbarHeight + 40.0f, _hierarchyPanelWidth, 160);
+            Rect screenRect = new Rect(0.0f, _toolbarHeight + 30.0f, _hierarchyPanelWidth, 160);
             string titleText = "Variable: " + _scope.ToString() + " " + _type.ToString();
             //GUI.Box(screenRect, "");
             GUILayout.BeginArea(screenRect);
@@ -631,7 +629,7 @@ namespace Catharsis.DialogueEditor
             DrawEditor();
             GUILayout.EndArea();
 
-            Rect scrollRect = new Rect(screenRect.x, screenRect.yMax,screenRect.width,position.height - screenRect.height - 20);
+            Rect scrollRect = new Rect(screenRect.x, screenRect.yMax,screenRect.width,position.height - screenRect.height - 48);
             GUI.Box(scrollRect, string.Empty);
            
             
@@ -1512,25 +1510,26 @@ namespace Catharsis.DialogueEditor
                 {
                     node.variableId = i;
                 }
-                GUI.color = new Color(1, 1, 1, 0.5f);
-                GUI.Box(row, string.Empty);
+                //GUI.color = new Color(1, 1, 1, 0.5f);
+                //GUI.Box(row, string.Empty);
                 if (i == node.variableId)
                 {
-                    GUI.Box(row, string.Empty);
-                    GUI.Box(row, string.Empty);
+                    if (_highlightTexture == null)
+                    {
+                        CreateHighlightTexture();
+                    }
+                    GUI.DrawTexture(row, _highlightTexture, ScaleMode.StretchToFill);
                     
                 }
 
+                //Highlights
                 if (row.Contains(Event.current.mousePosition))
                 {
-                    GUI.color = Color.white;
-                    GUI.Box(row, string.Empty);
-                    GUI.Box(row, string.Empty);
-                    GUI.Box(row, string.Empty);
+                    
                     
                 }
 
-                GUI.color = GUI.contentColor;
+                //GUI.color = GUI.contentColor;
 
                 Rect labelNumberRow = new Rect(row.x + 2, row.y + 2, row.width - 4, row.height - 4);
                 Rect labelNameRow = new Rect(labelNumberRow.x + 25, labelNumberRow.y, labelNumberRow.width - 25, labelNumberRow.height);
