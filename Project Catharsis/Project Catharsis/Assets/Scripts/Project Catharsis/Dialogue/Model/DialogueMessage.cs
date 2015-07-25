@@ -18,14 +18,14 @@ namespace Catharsis.DialogueEditor.Model
         /// <summary>
         /// If the message has audio
         /// </summary>
-        public string audioClip;
+        public AudioClip audioClip;
 
         /// <summary>
         /// The message's branching choices
         /// </summary>
         public string[] choices;
 
-        public DialogueMessage(string txt, Character speaker,  string audio, List<string> choice)
+        public DialogueMessage(string txt, Character speaker, AudioClip audio, List<string> choice)
         {
             this.text = txt;
             this.speaker = speaker;
@@ -37,5 +37,6 @@ namespace Catharsis.DialogueEditor.Model
                 this.choices = temp.Clone() as string[];
             }
         }
+        //Probably make a consutrctor that uses resource load.
     }
 }

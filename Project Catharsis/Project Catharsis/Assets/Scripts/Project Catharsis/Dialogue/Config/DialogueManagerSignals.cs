@@ -4,6 +4,11 @@ using strange.extensions.signal.impl;
 namespace Catharsis.DialogueEditor.Config
 {
     /// <summary>
+    /// This signal is called to load a specific scenario.
+    /// </summary>
+    public class DialogueLoadSignal : Signal<string> { }
+
+    /// <summary>
     /// This Signal is sent when the user initiates a dialogue, like clicking on an NPC.
     /// Params:
     /// int dialogue ID
@@ -11,6 +16,13 @@ namespace Catharsis.DialogueEditor.Config
     public class DialogueStartSignal : Signal<int> { }
 
     public class DialogueEndSignal : Signal { }
+
+    /// <summary>
+    /// This Signal is called when a node has completed
+    /// Params:
+    /// int nextNode id;
+    /// </summary>
+    public class DialogueNodeCompleteSignal : Signal<int> { }
 
     /// <summary>
     /// This is called by the Dialogue GUI, when the user continues the dialogue or selects a choice if the dialogue is branching.

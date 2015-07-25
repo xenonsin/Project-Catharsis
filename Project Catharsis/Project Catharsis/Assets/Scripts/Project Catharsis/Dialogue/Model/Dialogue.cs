@@ -8,23 +8,32 @@ namespace Catharsis.DialogueEditor.Model
         /// <summary>
         /// Name of the Dialogue
         /// </summary>
-        public string name;
+        public readonly string name;
 
         /// <summary>
         /// Dialogue ID
         /// </summary>
-        public int id;
+        public readonly int startNodeid;
 
         /// <summary>
         /// List of all messages the dialogue contains.
         /// </summary>
-        public List<DialogueNode> nodes;
+        public readonly List<DialogueNode> nodes;
 
-        public Dialogue(string name, int id, List<DialogueNode> nodes)
+        private readonly DialogueVariables _originalLocalVariables;
+        public DialogueVariables LocalVariables;
+
+        public Dialogue(string name, int startNodeid, DialogueVariables localVariables, List<DialogueNode> nodes)
         {
             this.name = name;
-            this.id = id;
+            this.startNodeid = startNodeid;
+            this._originalLocalVariables = localVariables;
             this.nodes = nodes;
+        }
+
+        public void Reset()
+        {
+            LocalVariables = _originalLocalVariables.Clone();
         }
 
     }

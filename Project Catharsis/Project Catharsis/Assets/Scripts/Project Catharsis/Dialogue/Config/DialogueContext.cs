@@ -11,10 +11,16 @@ namespace Catharsis.DialogueEditor.Config
         {
             commandBinder.Bind<StartSignal>().To<DialogueManagerStartCommand>().Once();
 
+            injectionBinder.Bind<IDialogueSystem>().To<DialogueSystem>().ToSingleton();
+
+            //This is called when a user loads a scenerio.
+            injectionBinder.Bind<DialogueLoadSignal>().ToSingleton().CrossContext();
             //This is called when a user clicks an npc.. during the game context
             injectionBinder.Bind<DialogueStartSignal>().ToSingleton().CrossContext();
             //This is called by the dialogue manager to signal other listening components
             injectionBinder.Bind<DialogueGenericEventSignal>().ToSingleton().CrossContext();
+            //This is called when a node ends.
+            injectionBinder.Bind<DialogueNodeCompleteSignal>().ToSingleton();
             //This is called when the dialogue ends.
             injectionBinder.Bind<DialogueEndSignal>().ToSingleton();
             //This is called when wanting to go to next dialogue.

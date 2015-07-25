@@ -1,6 +1,6 @@
 ﻿namespace Catharsis.DialogueEditor
 {
-    public class IDialogueManager
+    public class IDialogueSystem
     {
          
     }

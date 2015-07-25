@@ -1,4 +1,9 @@
-﻿using strange.extensions.injector.api;
+﻿/*
+ * This is in charge of providing the paths to the save folders.
+ * When saving user specific content like input, and save files.
+ */
+
+using strange.extensions.injector.api;
 using strange.extensions.injector.impl;
 using UnityEngine;
 

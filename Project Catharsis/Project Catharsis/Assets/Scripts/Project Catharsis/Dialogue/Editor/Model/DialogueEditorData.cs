@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Catharsis.DialogueEditor.Model.Nodes;
 using Catharsis.DialogueEditor.Model.Objects;
 using UnityEngine;
 
@@ -70,6 +71,137 @@ namespace Catharsis.DialogueEditor.Model
             }
 
             return dialogues.Count;
+        }
+
+        public DialogueData getDialoguerData()
+        {
+
+            #region Global Variables
+            List<bool> globalBooleans = new List<bool>();
+            List<float> globalFloats = new List<float>();
+            List<string> globalStrings = new List<string>();
+
+            for (int i = 0; i < globals.booleans.variables.Count; i += 1)
+            {
+                bool parsedBoolean;
+                bool success = bool.TryParse(globals.booleans.variables[i].variable, out parsedBoolean);
+                if (!success) Debug.LogWarning("Global Boolean " + i + " did not parse correctly, defaulting to false");
+                globalBooleans.Add(parsedBoolean);
+            }
+
+            for (int i = 0; i < globals.floats.variables.Count; i += 1)
+            {
+                float parsedFloat;
+                bool success = float.TryParse(globals.floats.variables[i].variable, out parsedFloat);
+                if (!success) Debug.LogWarning("Global Float " + i + " did not parse correctly, defaulting to 0");
+                globalFloats.Add(parsedFloat);
+            }
+
+            for (int i = 0; i < globals.strings.variables.Count; i += 1)
+            {
+                globalStrings.Add(globals.strings.variables[i].variable);
+            }
+
+            DialogueGlobalVariables newGlobalVariables = new DialogueGlobalVariables(globalBooleans, globalFloats, globalStrings);
+            #endregion
+
+            #region Dialogues
+            List<Dialogue> newDialogues = new List<Dialogue>();
+
+            // Loop through Dialogues
+            for (int d = 0; d < this.dialogues.Count; d += 1)
+            {
+                DialogueEditorDialogueObject dialogue = dialogues[d];
+
+                #region Dialogue Phases
+                List<DialogueNode> newNodes = new List<DialogueNode>();
+                // Loop through phases
+                for (int p = 0; p < dialogue.nodes.Count; p += 1)
+                {
+                    DialogueEditorNodeObject node = dialogue.nodes[p];
+
+                    switch (node.type)
+                    {
+
+                        case DialogueEditorNodeTypes.MessageNode:
+                            newNodes.Add(new MessageNode(node.text, node.characterName, node.animName, node.audioName, node.metadata, node.waitForResponse, node.waitDuration, node.waitType, node.rect, node.outs));
+                            break;
+
+                        case DialogueEditorNodeTypes.BranchingMessageNode:
+                            newNodes.Add(new BranchedMessageNode(node.text, node.choices, node.theme, node.newWindow, node.name, node.portrait, node.metadata, node.audio, node.audioDelay, node.rect, node.outs));
+                            break;
+
+                        case DialogueEditorNodeTypes.SetVariableNode:
+                            newNodes.Add(new SetVariablePhase(node.variableScope, node.variableType, node.variableId, node.variableSetEquation, node.variableSetValue, node.outs));
+                            break;
+
+                        case DialogueEditorNodeTypes.ConditionalNode:
+                            newNodes.Add(new ConditionalPhase(node.variableScope, node.variableType, node.variableId, node.variableGetEquation, node.variableGetValue, node.outs));
+                            break;
+
+                        case DialogueEditorNodeTypes.GenericEventNode:
+                            newNodes.Add(new SendMessagePhase(node.messageName, node.metadata, node.outs));
+                            break;
+
+                        case DialogueEditorNodeTypes.EndNode:
+                            newNodes.Add(new EndPhase());
+                            break;
+
+                        default:
+                            newNodes.Add(new EmptyPhase());
+                            break;
+
+                    }
+                }
+                #endregion
+
+                #region Dialogue Variables
+                //Booleans
+                List<bool> localBooleans = new List<bool>();
+                for (int i = 0; i < dialogue.booleans.variables.Count; i += 1)
+                {
+                    bool newBoolean;
+                    bool success = bool.TryParse(dialogue.booleans.variables[i].variable, out newBoolean);
+                    if (!success) Debug.Log("Dialogue " + d + ": Boolean " + i + " not formatted correctly. Defaulting to false");
+                    localBooleans.Add(newBoolean);
+                }
+
+                //Floats
+                List<float> localFloats = new List<float>();
+                for (int i = 0; i < dialogue.floats.variables.Count; i += 1)
+                {
+                    float newFloat;
+                    bool success = float.TryParse(dialogue.floats.variables[i].variable, out newFloat);
+                    if (!success) Debug.Log("Dialogue " + d + ": Float " + i + " not formatted correctly. Defaulting to 0");
+                    localFloats.Add(newFloat);
+                }
+
+                //Strings
+                List<string> localStrings = new List<string>();
+                for (int i = 0; i < dialogue.strings.variables.Count; i += 1)
+                {
+                    localStrings.Add(dialogue.strings.variables[i].variable);
+                }
+
+                DialogueVariables localVariables = new DialogueVariables(localBooleans, localFloats, localStrings);
+                #endregion
+
+                Dialogue newDialogue = new Dialogue(dialogue.dialogueName, dialogue.startPage.Value, localVariables, newPhases);
+                //Debug.Log(newDialogue.ToString());
+                newDialogues.Add(newDialogue);
+            }
+            #endregion
+
+            #region Themes
+            List<DialoguerTheme> newThemes = new List<DialoguerTheme>();
+            for (int i = 0; i < themes.themes.Count; i += 1)
+            {
+                newThemes.Add(new DialoguerTheme(themes.themes[i].name, themes.themes[i].linkage));
+            }
+            #endregion
+
+            DialoguerData newData = new DialoguerData(newGlobalVariables, newDialogues, newThemes);
+            return newData;
         }
     }
 }

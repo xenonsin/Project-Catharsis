@@ -557,7 +557,7 @@ namespace Catharsis.DialogueEditor
             GUILayout.BeginHorizontal();
             if (GUILayout.Toggle(_options == HierarchyOptions.DialogueSelector, "Dialogues", EditorStyles.miniButtonLeft))
                 _options = HierarchyOptions.DialogueSelector;
-            if (GUILayout.Toggle(_options == HierarchyOptions.VariableEditor, "Variables", EditorStyles.miniButtonRight))
+            if (GUILayout.Toggle(_options == HierarchyOptions.VariableEditor, "Variables", EditorStyles.miniButtonRight) && _dialogueData.data.DialogueCount > 0)
                 _options = HierarchyOptions.VariableEditor;
 
             GUILayout.EndHorizontal();
