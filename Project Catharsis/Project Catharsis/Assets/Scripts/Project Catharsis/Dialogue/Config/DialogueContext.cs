@@ -27,6 +27,7 @@ namespace Catharsis.DialogueEditor.Config
             injectionBinder.Bind<DialogueContinueSignal>().ToSingleton();
             //This is called by the Dialogue Manager whenever it's a message node.
             injectionBinder.Bind<DialogueMessageSignal>().ToSingleton();
+            injectionBinder.Bind<DialogueOnSuddenlyEndedSignal>().ToSingleton();
             
 
             base.mapBindings();

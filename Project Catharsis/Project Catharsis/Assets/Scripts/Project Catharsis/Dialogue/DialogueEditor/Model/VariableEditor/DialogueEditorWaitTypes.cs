@@ -4,6 +4,7 @@
     {
         Seconds,
         Frames,
-        Continue
+        Continue,
+        WaitForResponse
     }
 }

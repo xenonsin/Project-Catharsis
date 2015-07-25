@@ -1,4 +1,5 @@
 ﻿using Catharsis.DialogueEditor.Model;
+using Catharsis.DialogueEditor.Model.Data;
 using strange.extensions.signal.impl;
 
 namespace Catharsis.DialogueEditor.Config
@@ -14,6 +15,12 @@ namespace Catharsis.DialogueEditor.Config
     /// int dialogue ID
     /// </summary>
     public class DialogueStartSignal : Signal<int> { }
+
+    public class DialogueOnStartedSignal : Signal { }
+
+    public class DialogueOnSuddenlyEndedSignal : Signal { }
+
+    public class DialogueOnEndedSignal : Signal { }
 
     public class DialogueEndSignal : Signal { }
 
@@ -34,7 +41,7 @@ namespace Catharsis.DialogueEditor.Config
     /// <summary>
     /// This is sent to the Dialogue GUI with information of the text.
     /// </summary>
-    public class DialogueMessageSignal : Signal<DialogueMessage> {}
+    public class DialogueMessageSignal : Signal<TextData> { }
 
     /// <summary>
     /// This Signal is sent when the event node is called. 

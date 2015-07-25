@@ -77,7 +77,7 @@ namespace Catharsis.DialogueEditor.Model.Data
                 return (choices == null) ? MessageNodeType.Message : MessageNodeType.BranchedMessage;
 		    }
 	    }
-	
+
 
         public TextData(string text, string charName, string animName, string audioName, string metadata, bool waitForResponse, float waitDuration, DialogueEditorWaitTypes waitType, Rect rect, List<string> choices)
         {
@@ -93,7 +93,8 @@ namespace Catharsis.DialogueEditor.Model.Data
 		    this.metadata = metadata;
             this.waitForResponse = waitForResponse;
             this.waitDuration = waitDuration;
-		    this.waitType = waitType;
+            this.waitType = waitType;
+
 		    this.rect = new Rect(rect.x, rect.y, rect.width, rect.height);
 		    if(choices != null){
 			    string[] choicesClone = choices.ToArray();

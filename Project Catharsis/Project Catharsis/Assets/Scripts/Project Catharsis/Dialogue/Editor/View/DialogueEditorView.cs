@@ -1697,6 +1697,7 @@ namespace Catharsis.DialogueEditor
 
                 if (node.waitForResponse == true)
                 {
+                    node.waitType = DialogueEditorWaitTypes.WaitForResponse;
                     GUI.color = new Color(1, 1, 1, 0.25f);
                     GUI.Label(new Rect(waitRect.xMax - 110, waitRect.y + 5, 100, 20), "Wait:");
                     GUI.Box(waitTextFieldRect, string.Empty);

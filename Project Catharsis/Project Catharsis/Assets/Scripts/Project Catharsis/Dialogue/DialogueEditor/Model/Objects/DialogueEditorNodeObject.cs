@@ -210,6 +210,7 @@ namespace Catharsis.DialogueEditor.Model.Objects
 
             node.id = id;
             node.type = DialogueEditorNodeTypes.MessageNode;
+            node.waitType = DialogueEditorWaitTypes.WaitForResponse;
 
             node.position = Vector2.zero;
 
@@ -235,6 +236,7 @@ namespace Catharsis.DialogueEditor.Model.Objects
 
             node.id = id;
             node.type = DialogueEditorNodeTypes.BranchingMessageNode;
+            node.waitType = DialogueEditorWaitTypes.WaitForResponse;
 
             node.position = Vector2.zero;
 

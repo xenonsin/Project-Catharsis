@@ -6,18 +6,20 @@ namespace Catharsis.GlobalVariablesManager.Model
     [Serializable]
     public class GlobalVariables
     {
-        public Dictionary<string, bool> booleans;
-        public Dictionary<string, float> floats;
-        public Dictionary<string, string> strings;
+        //TODO CANT SERIALIZE DICTIONARIESSS
+
+        public Dictionary<int, bool> booleans;
+        public Dictionary<int, float> floats;
+        public Dictionary<int, string> strings;
 
         public GlobalVariables()
         {
-            booleans = new Dictionary<string, bool>();
-            floats = new Dictionary<string, float>();
-            strings = new Dictionary<string, string>();
+            booleans = new Dictionary<int, bool>();
+            floats = new Dictionary<int, float>();
+            strings = new Dictionary<int, string>();
         }
 
-        public GlobalVariables(Dictionary<string, bool> booleans, Dictionary<string, float> floats, Dictionary<string, string> strings)
+        public GlobalVariables(Dictionary<int, bool> booleans, Dictionary<int, float> floats, Dictionary<int, string> strings)
         {
             this.booleans = booleans;
             this.floats = floats;

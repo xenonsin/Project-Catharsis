@@ -66,55 +66,55 @@ namespace Catharsis.GlobalVariablesManager
 
         #region Getters and Setters
 
-        public float GetGlobalFloat(string id)
+        public float GetFloat(int id)
         {
             float value;
-            if (_data.floats.TryGetValue("id", out value))
+            if (_data.floats.TryGetValue(id, out value))
                 return value;
 
             return 0f; 
         }
 
-        public void SetGlobalFloat(string id, float value)
+        public void SetFloat(int id, float value)
         {
             if (_data.floats.ContainsKey(id))
                 _data.floats[id] = value;
             else
-                _data.floats.Add("id", value);
+                _data.floats.Add(id, value);
         }
 
-        public bool GetGlobalBool(string id)
+        public bool GetBool(int id)
         {
             bool value;
-            if (_data.booleans.TryGetValue("id", out value))
+            if (_data.booleans.TryGetValue(id, out value))
                 return value;
             
             return false;
         }
 
-        public void SetGlobalBool(string id, bool value)
+        public void SetBool(int id, bool value)
         {
             if (_data.booleans.ContainsKey(id))
                 _data.booleans[id] = value;
             else
-                _data.booleans.Add("id", value);
+                _data.booleans.Add(id, value);
         }
 
-        public string GetGlobalString(string id)
+        public string GetString(int id)
         {
             string value;
-            if (_data.strings.TryGetValue("id", out value))
+            if (_data.strings.TryGetValue(id, out value))
                 return value;
 
             return default(string);
         }
 
-        public void SetGlobalString(string id, string value)
+        public void SetString(int id, string value)
         {
             if (_data.strings.ContainsKey(id))
                 _data.strings[id] = value;
             else
-                _data.strings.Add("id", value);
+                _data.strings.Add(id, value);
         }
 
         #endregion

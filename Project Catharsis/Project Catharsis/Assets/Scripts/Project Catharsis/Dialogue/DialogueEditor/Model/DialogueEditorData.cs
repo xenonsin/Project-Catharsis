@@ -12,10 +12,8 @@ namespace Catharsis.DialogueEditor.Model
 
         public List<DialogueEditorDialogueObject> dialogues;
         public DialogueEditorGlobalVariablesContainer globals;
-        public List<int> abandonedIds; 
+        private List<int> abandonedIds; 
         public int DialogueCount { get { return dialogues.Count; } }
-
-        private int _currentDialogueId;
 
 
         public DialogueEditorData()
@@ -73,7 +71,7 @@ namespace Catharsis.DialogueEditor.Model
             return dialogues.Count;
         }
 
-        public DialogueData getDialoguerData()
+        public DialogueData GetDialogueData()
         {
 
             #region Global Variables
@@ -85,7 +83,7 @@ namespace Catharsis.DialogueEditor.Model
             {
                 bool parsedBoolean;
                 bool success = bool.TryParse(globals.booleans.variables[i].variable, out parsedBoolean);
-                if (!success) Debug.LogWarning("Global Boolean " + i + " did not parse correctly, defaulting to false");
+                if (!success) Debug.LogWarning("Global Boolean " + i + " did not parse correc tly, defaulting to false");
                 globalBooleans.Add(parsedBoolean);
             }
 
@@ -128,27 +126,27 @@ namespace Catharsis.DialogueEditor.Model
                             break;
 
                         case DialogueEditorNodeTypes.BranchingMessageNode:
-                            newNodes.Add(new BranchedMessageNode(node.text, node.choices, node.theme, node.newWindow, node.name, node.portrait, node.metadata, node.audio, node.audioDelay, node.rect, node.outs));
+                            newNodes.Add(new BranchedMessageNode(node.text, node.characterName, node.animName, node.audioName, node.metadata, node.waitForResponse, node.waitDuration, node.waitType, node.rect, node.outs));
                             break;
 
                         case DialogueEditorNodeTypes.SetVariableNode:
-                            newNodes.Add(new SetVariablePhase(node.variableScope, node.variableType, node.variableId, node.variableSetEquation, node.variableSetValue, node.outs));
+                            newNodes.Add(new SetVariableNode(node.variableScope, node.variableType, node.variableId, node.variableSetEquation, node.variableSetValue, node.outs));
                             break;
 
                         case DialogueEditorNodeTypes.ConditionalNode:
-                            newNodes.Add(new ConditionalPhase(node.variableScope, node.variableType, node.variableId, node.variableGetEquation, node.variableGetValue, node.outs));
+                            newNodes.Add(new ConditionalNode(node.variableScope, node.variableType, node.variableId, node.variableGetEquation, node.variableGetValue, node.outs));
                             break;
 
                         case DialogueEditorNodeTypes.GenericEventNode:
-                            newNodes.Add(new SendMessagePhase(node.messageName, node.metadata, node.outs));
+                            newNodes.Add(new GenericEventNode(node.eventName, node.metadata, node.outs));
                             break;
 
                         case DialogueEditorNodeTypes.EndNode:
-                            newNodes.Add(new EndPhase());
+                            newNodes.Add(new EndNode());
                             break;
 
                         default:
-                            newNodes.Add(new EmptyPhase());
+                            newNodes.Add(new EmptyNode());
                             break;
 
                     }
@@ -186,21 +184,13 @@ namespace Catharsis.DialogueEditor.Model
                 DialogueVariables localVariables = new DialogueVariables(localBooleans, localFloats, localStrings);
                 #endregion
 
-                Dialogue newDialogue = new Dialogue(dialogue.dialogueName, dialogue.startPage.Value, localVariables, newPhases);
+                Dialogue newDialogue = new Dialogue(dialogue.dialogueName, dialogue.startPage.Value, localVariables, newNodes);
                 //Debug.Log(newDialogue.ToString());
                 newDialogues.Add(newDialogue);
             }
             #endregion
 
-            #region Themes
-            List<DialoguerTheme> newThemes = new List<DialoguerTheme>();
-            for (int i = 0; i < themes.themes.Count; i += 1)
-            {
-                newThemes.Add(new DialoguerTheme(themes.themes[i].name, themes.themes[i].linkage));
-            }
-            #endregion
-
-            DialoguerData newData = new DialoguerData(newGlobalVariables, newDialogues, newThemes);
+            DialogueData newData = new DialogueData(newGlobalVariables, newDialogues);
             return newData;
         }
     }
