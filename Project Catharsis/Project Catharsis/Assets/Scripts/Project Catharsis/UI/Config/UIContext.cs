@@ -1,4 +1,6 @@
-﻿using Catharsis.InputEditor;
+﻿using Catharsis.DialogueEditor;
+using Catharsis.DialogueEditor.Config;
+using Catharsis.InputEditor;
 using Catharsis.UI.Control;
 using UnityEngine;
 
@@ -23,6 +25,17 @@ namespace Catharsis.UI
                 injectionBinder.Bind<InputManagerLoadedSignal>().ToSingleton().CrossContext();
                 injectionBinder.Bind<InputManagerLoadDefaultInputSignal>().ToSingleton().CrossContext();
 
+                //Dialogue Signals
+                injectionBinder.Bind<IDialogueSystem>().To<DialogueSystem>().ToSingleton();
+                injectionBinder.Bind<DialogueLoadSignal>().ToSingleton().CrossContext();
+                injectionBinder.Bind<DialogueStartSignal>().ToSingleton().CrossContext();
+                injectionBinder.Bind<DialogueGenericEventSignal>().ToSingleton().CrossContext();
+                injectionBinder.Bind<DialogueNodeCompleteSignal>().ToSingleton();
+                injectionBinder.Bind<DialogueEndSignal>().ToSingleton();
+                injectionBinder.Bind<DialogueContinueSignal>().ToSingleton();
+                injectionBinder.Bind<DialogueMessageSignal>().ToSingleton().CrossContext();
+                injectionBinder.Bind<DialogueOnSuddenlyEndedSignal>().ToSingleton();
+
                 //Input Manager Commands
                 commandBinder.Bind<InputManagerLoadUserInputSignal>().To<LoadInputCommand>().Pooled();
                 commandBinder.Bind<InputManagerSaveSignal>().To<SaveInputCommand>().Pooled();
@@ -36,13 +49,26 @@ namespace Catharsis.UI
                 injectionBinder.Bind<QuitApplicationSignal>().ToSingleton().CrossContext();
 
             }
-
-            //Signals with no commands.    
+ 
+            //Control Panel
             injectionBinder.Bind<ShowPauseMenuSignal>().ToSingleton().CrossContext();
             injectionBinder.Bind<ShowControlPageSignal>().ToSingleton().CrossContext();
             injectionBinder.Bind<ShowMainPageSignal>().ToSingleton().CrossContext();
             injectionBinder.Bind<ClosePauseMenuSignal>().ToSingleton().CrossContext();
             injectionBinder.Bind<ShowOptionPageSignal>().ToSingleton().CrossContext();
+
+            mediationBinder.Bind<PauseMenuView>().To<PauseMenuMediator>();
+            mediationBinder.Bind<PausePanelMenuView>().To<PausePanelMenuMediator>();
+            mediationBinder.Bind<OptionsPageView>().To<OptionsPageMediator>();
+            mediationBinder.Bind<ControlPageView>().To<ControlPageMediator>();
+
+
+            //Dialogue Panel
+            injectionBinder.Bind<ShowDialoguePageSignal>().ToSingleton().CrossContext();
+            injectionBinder.Bind<CloseDialoguePageSignal>().ToSingleton().CrossContext();
+
+            mediationBinder.Bind<DialoguePanelView>().To<DialoguePanelMediator>();
+            mediationBinder.Bind<DialoguePageView>().To<DialoguePageMediator>();
 
             //commands
             commandBinder.Bind<StartSignal>().To<UIStartCommand>();
@@ -51,10 +77,7 @@ namespace Catharsis.UI
 
 
             //mediators
-            mediationBinder.Bind<PauseMenuView>().To<PauseMenuMediator>();
-            mediationBinder.Bind<PausePanelMenuView>().To<PausePanelMenuMediator>();
-            mediationBinder.Bind<OptionsPageView>().To<OptionsPageMediator>();
-            mediationBinder.Bind<ControlPageView>().To<ControlPageMediator>();
+            
         }
 
         protected override void postBindings()

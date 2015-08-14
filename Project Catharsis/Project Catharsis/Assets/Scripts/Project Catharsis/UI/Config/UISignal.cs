@@ -16,4 +16,8 @@ namespace Catharsis.UI
     public class QuitGameSignal : Signal { }
 
     public class PauseGameSignal : Signal { }
+
+    public class ShowDialoguePageSignal : Signal { }
+
+    public class CloseDialoguePageSignal : Signal { }
 }

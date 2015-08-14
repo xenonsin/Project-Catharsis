@@ -5,7 +5,7 @@
 using Catharsis.DialogueEditor.Config;
 using strange.extensions.context.impl;
 
-namespace Assets.Scripts.Project_Catharsis.Dialogue
+namespace Catharsis.DialogueEditor
 {
     public class DialogueBootstrap : ContextView
     {

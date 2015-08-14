@@ -26,7 +26,7 @@ namespace Catharsis.DialogueEditor.Config
             //This is called when wanting to go to next dialogue.
             injectionBinder.Bind<DialogueContinueSignal>().ToSingleton();
             //This is called by the Dialogue Manager whenever it's a message node.
-            injectionBinder.Bind<DialogueMessageSignal>().ToSingleton();
+            injectionBinder.Bind<DialogueMessageSignal>().ToSingleton().CrossContext();
             injectionBinder.Bind<DialogueOnSuddenlyEndedSignal>().ToSingleton();
             
 

@@ -1335,7 +1335,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 927572743}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 20f9a330a1cc26040b7296e9eef77fcf, type: 3}
+  m_Script: {fileID: 11500000, guid: 63e9ad182204f6347a69673fce27334b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ResumeButton: {fileID: 1674428867}
@@ -1481,6 +1481,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 1003961522}
+  - 114: {fileID: 1003961523}
   m_Layer: 0
   m_Name: Dialogue
   m_TagString: Untagged
@@ -1501,6 +1502,19 @@ Transform:
   - {fileID: 1850345996}
   m_Father: {fileID: 189974398}
   m_RootOrder: 1
+--- !u!114 &1003961523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1003961521}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5063742daaba73541b5267dafea80393, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canvas: {fileID: 1850345999}
+  dialoguePanel: {fileID: 1956947638}
 --- !u!1 &1010757264
 GameObject:
   m_ObjectHideFlags: 0
@@ -1538,7 +1552,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1010757264}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d938610ff69702240875ecddadd17310, type: 3}
+  m_Script: {fileID: 11500000, guid: 0a2374b28e5231542bab915e03b210e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   canvas: {fileID: 826921114}
@@ -2422,8 +2436,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1755283318}
   m_HandleRect: {fileID: 1755283317}
   m_Direction: 2
-  m_Value: .5
-  m_Size: .5826087
+  m_Value: .500000179
+  m_Size: .586675584
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2565,7 +2579,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1390609982}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54f069cbd93dd8646a69ec8d566773f5, type: 3}
+  m_Script: {fileID: 11500000, guid: 1b05790a87b2b1b45b390a467cc45310, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   BackButton: {fileID: 1976129919}
@@ -3780,7 +3794,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1846513303}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db775075db2b51a4da47159d66c63d78, type: 3}
+  m_Script: {fileID: 11500000, guid: 69476ffcf97d2cb41ba85483a72aaef3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ControlsButton: {fileID: 452852888}
@@ -3862,6 +3876,7 @@ GameObject:
   - 223: {fileID: 1850345999}
   - 114: {fileID: 1850345998}
   - 114: {fileID: 1850345997}
+  - 114: {fileID: 1850346000}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -3941,6 +3956,27 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
+--- !u!114 &1850346000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1850345995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1980459831, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_UiScaleMode: 1
+  m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 800, y: 600}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 1
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 96
+  m_DefaultSpriteDPI: 96
+  m_DynamicPixelsPerUnit: 1
 --- !u!1 &1910422711
 GameObject:
   m_ObjectHideFlags: 0
@@ -4051,8 +4087,9 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 224: {fileID: 1956947639}
+  - 114: {fileID: 1956947640}
   m_Layer: 5
-  m_Name: Dialogue Page
+  m_Name: Dialogue Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4073,9 +4110,22 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -49.9999847}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: .5, y: .5}
+--- !u!114 &1956947640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1956947638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adeead6424a1a76439f830c012e430e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ContinueButton: {fileID: 1790922345}
+  Scrollbar: {fileID: 1910422713}
 --- !u!1 &1976129917
 GameObject:
   m_ObjectHideFlags: 0
